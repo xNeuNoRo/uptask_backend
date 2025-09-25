@@ -23,7 +23,12 @@
     "resolveJsonModule": true,
     // Para los decoradores de los modelos, [SEQUELIZE u otro ORM con decoradores]
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
+    // Para simplificar los imports utilizando @ en vez de todos los "../../" de las rutas
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "dist", "src/**/*.test.ts"]
