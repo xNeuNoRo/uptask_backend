@@ -2,10 +2,10 @@
   "name": "rest-api-uptask",
   "version": "1.0.0",
   "description": "Gestor de tareas moderno",
-  "main": "src/index.ts",
+  "main": "src/server.ts",
   "scripts": {
-    "start": "tsx src/index.ts",
-    "dev": "pnpm dlx tsx watch src/index.ts",
+    "start": "tsx src/server.ts",
+    "dev": "pnpm dlx tsx watch src/server.ts",
     "prepare-husky": "git init && pnpm dlx husky-init && pnpm install && npx husky add .husky/pre-commit \"pnpm lint-staged\"",
     "check": "node build.mjs",
     "lint": "eslint . --ext .ts,.js",
@@ -71,6 +71,7 @@
     "colorette": "^2.0.20",
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
+    "express-validator": "^7.2.1",
     "mongoose": "^8.18.2"
   }
 }
