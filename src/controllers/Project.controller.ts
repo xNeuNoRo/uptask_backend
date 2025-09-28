@@ -9,6 +9,7 @@ export class ProjectController {
       await project.save();
       res.success(null, 201);
     } catch (err) {
+      if (err instanceof AppError) throw err;
       console.log(err);
       throw new AppError("DB_CONSULT_ERROR");
     }
@@ -18,6 +19,7 @@ export class ProjectController {
       const projects = await Project.find();
       res.success(projects);
     } catch (err) {
+      if (err instanceof AppError) throw err;
       console.log(err);
       throw new AppError("DB_CONSULT_ERROR");
     }
@@ -33,6 +35,7 @@ export class ProjectController {
       if (!project) throw new AppError("PROJECT_NOT_FOUND");
       res.success(project);
     } catch (err) {
+      if (err instanceof AppError) throw err;
       console.log(err);
       throw new AppError("DB_CONSULT_ERROR");
     }
@@ -49,6 +52,7 @@ export class ProjectController {
       await project.save();
       res.success(project);
     } catch (err) {
+      if (err instanceof AppError) throw err;
       console.log(err);
       throw new AppError("DB_CONSULT_ERROR");
     }
@@ -65,6 +69,7 @@ export class ProjectController {
       await project.deleteOne();
       res.success(null, 204);
     } catch (err) {
+      if (err instanceof AppError) throw err;
       console.log(err);
       throw new AppError("DB_CONSULT_ERROR");
     }
