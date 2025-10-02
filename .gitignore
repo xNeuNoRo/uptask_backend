@@ -1,6 +1,7 @@
 .husky
 .tsbuildinfo
 .env
+.VSCodeCounter
 coverage
 dist
 node_modules
