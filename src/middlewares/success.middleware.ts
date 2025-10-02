@@ -1,10 +1,9 @@
-import { Request, Response, NextFunction } from "express";
+import type { Request, Response, NextFunction } from "express";
 
 // Declarations to add new properties to the interface Response of Express
 declare global {
   namespace Express {
     interface Response {
-      // Method to send a success response
       success: (data?: unknown, http?: number) => void;
     }
   }

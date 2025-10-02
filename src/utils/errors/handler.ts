@@ -1,3 +1,5 @@
+import { log, loggerFor, loggerForContext } from "@/lib/loggers";
+
 import { ERRORS } from ".";
 
 export type ErrorCode = keyof typeof ERRORS;
@@ -12,8 +14,17 @@ export class AppError extends Error {
   }
 }
 
+const logger = loggerForContext(loggerFor("infra"), { component: "api" });
+
 // Convert any unknown error (or internal API error) to AppError(INTERNAL)
-export const toAppError = (e: unknown) => {
-  if (!(e instanceof AppError)) console.log(e);
-  return e instanceof AppError ? e : new AppError("INTERNAL");
+export const toAppError = (err: unknown) => {
+  if (!(err instanceof AppError))
+    log(
+      logger,
+      "error",
+      "Unexpected error",
+      { status: "fail", errorCode: "INTERNAL" },
+      { err },
+    );
+  return err instanceof AppError ? err : new AppError("INTERNAL");
 };

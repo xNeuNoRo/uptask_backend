@@ -9,7 +9,7 @@ export function registerRoutes(app: Express) {
 
   // Mount the v1 routes
   v1.use("/projects", Project);
-  v1.use("/test", (req, res) => {
+  v1.use("/test", (_req, res) => {
     res.send("The API is working correctly");
   });
 

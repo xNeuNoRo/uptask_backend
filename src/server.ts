@@ -1,8 +1,11 @@
-import { cyan, red, bold } from "colorette";
 import { createApp } from "@/app";
 import { connectDB } from "@/config/db";
+import { log, loggerFor, loggerForContext } from "@/lib/loggers";
+
+const logger = loggerForContext(loggerFor("infra"), { component: "api" });
 
 async function initApp() {
+  const start = Date.now();
   try {
     // Connect to the database
     await connectDB();
@@ -13,10 +16,24 @@ async function initApp() {
 
     // Start the server
     app.listen(port, () => {
-      console.log(bold(cyan(`[APP] REST API running on port ${port}`)));
+      log(logger, "info", `REST API running on port ${port}`, {
+        status: "success",
+        operation: "start",
+        durationMs: Date.now() - start,
+      });
     });
   } catch (err) {
-    console.log(bold(red(`[APP ERROR]: ${(err as Error).message}`)));
+    log(
+      logger,
+      "fatal",
+      "Failed to start application",
+      {
+        status: "fail",
+        operation: "start",
+        durationMs: Date.now() - start,
+      },
+      { err },
+    );
     process.exit(1);
   }
 }
