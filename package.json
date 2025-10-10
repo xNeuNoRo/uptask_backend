@@ -44,6 +44,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
+    "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
     "@types/jest": "^30.0.0",
     "@types/supertest": "^6.0.3",
@@ -70,6 +71,7 @@
   },
   "dependencies": {
     "colorette": "^2.0.20",
+    "cors": "^2.8.5",
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
     "express-validator": "^7.2.1",

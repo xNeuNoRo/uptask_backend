@@ -1,12 +1,16 @@
 import "dotenv/config";
 import express, { type Express } from "express";
+import cors from "cors";
 
 import { error, success, httpLogger } from "@/middlewares";
 import { registerRoutes } from "@/routes";
 import { AppError } from "@/utils";
+import { corsConfig } from "./config/cors";
 
 export function createApp(): Express {
   const app: Express = express();
+
+  app.use(cors(corsConfig));
 
   // Global middlewares
   app.use(httpLogger);
