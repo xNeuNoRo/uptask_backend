@@ -1,4 +1,9 @@
+import { log, loggerFor, loggerForContext } from "@/lib/loggers";
 import { CorsOptions } from "cors";
+
+let logger = loggerForContext(loggerFor("infra"), {
+  component: "api",
+});
 
 export const corsConfig: CorsOptions = {
   origin: function (origin, callback) {
@@ -7,7 +12,16 @@ export const corsConfig: CorsOptions = {
     if (whitelist.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error("No permitido por CORS"));
+      callback(null, false);
+      log(
+        logger,
+        "warn",
+        "CORS origin denied",
+        {
+          status: "fail",
+        },
+        { origin },
+      );
     }
   },
 };
