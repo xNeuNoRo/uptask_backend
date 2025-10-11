@@ -21,7 +21,7 @@ export class TaskController {
       task.project = project.id;
       project.tasks.push(task.id);
       await Promise.allSettled([task.save(), project.save()]);
-      res.success(task, 201);
+      res.success(null, 201);
       log(logger, "info", `Task created with ID: ${task.id}`, {
         entityId: task.id,
         operation: "create",
