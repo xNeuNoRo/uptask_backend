@@ -24,7 +24,7 @@ export async function projectExists(
 ) {
   const { projectId } = req.params;
   try {
-    const project = await Project.findById(projectId);
+    const project = await Project.findById(projectId).populate("tasks");
     if (!project) throw new AppError("PROJECT_NOT_FOUND");
     req.project = project; // Attach project to request object
     next();
