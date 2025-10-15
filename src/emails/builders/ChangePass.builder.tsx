@@ -7,9 +7,14 @@ export async function sendChangePassEmail(params: {
   to: string;
   name?: string;
   changePassLink: string;
+  sixDigitCode: string;
 }) {
   const view = await render(
-    <ChangePass name={params.name} changePassLink={params.changePassLink} />,
+    <ChangePass
+      name={params.name}
+      changePassLink={params.changePassLink}
+      sixDigitCode={params.sixDigitCode}
+    />,
   );
   return MailUtils.sendMail({
     to: params.to,

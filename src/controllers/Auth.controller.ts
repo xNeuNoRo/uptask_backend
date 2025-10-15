@@ -4,6 +4,7 @@ import { AppError, AuthUtils } from "@/utils";
 import User from "@/models/User.model";
 import Token from "@/models/Token.model";
 import { sendVerificationEmail } from "@/emails/builders/Verification.builder";
+import { sendChangePassEmail } from "@/emails/builders/ChangePass.builder";
 
 // let logger = loggerForContext(loggerFor("auth"), {
 //   entityType: "user",
@@ -72,11 +73,52 @@ export class AuthController {
       });
 
       await token.save();
-      res.success(null, 201);
+      res.success(null, 200);
 
       sendVerificationEmail({
         to: user.email,
         verificationLink: `${process.env.FRONTEND_URL}/auth/confirm`,
+        sixDigitCode,
+      });
+    } catch (err) {
+      if (err instanceof AppError) throw err;
+      throw new AppError("DB_CONSULT_ERROR");
+    }
+  };
+
+  static forgotPassword = async (
+    req: Request<{}, {}, { email: string }>,
+    res: Response,
+  ) => {
+    try {
+      const { email } = req.body;
+
+      const user = await User.findOne({ email });
+      if (!user) throw new AppError("USER_NOT_FOUND");
+      if (!user.confirmed) throw new AppError("USER_NOT_CONFIRMED");
+
+      // Delete all resetPassword tokens for this user
+      await Token.deleteMany({
+        user: user.id,
+        type: "resetPassword",
+      });
+
+      const sixDigitCode = AuthUtils.generate6DigitToken();
+      const token = new Token({
+        token: sixDigitCode,
+        type: "resetPassword",
+        user: user.id,
+        expiresAt: Date.now() + 1800000, // 30 minutes
+      });
+
+      await token.save();
+
+      res.success(null, 200);
+
+      sendChangePassEmail({
+        to: user.email,
+        name: user.name,
+        changePassLink: `${process.env.FRONTEND_URL}/auth/new-password`,
         sixDigitCode,
       });
     } catch (err) {
@@ -101,6 +143,48 @@ export class AuthController {
       if (!user) throw new AppError("USER_NOT_FOUND");
       user.confirmed = true;
 
+      await Promise.allSettled([user.save(), tokenExists.deleteOne()]);
+
+      res.success(null, 200);
+    } catch (err) {
+      if (err instanceof AppError) throw err;
+      throw new AppError("DB_CONSULT_ERROR");
+    }
+  };
+
+  static validateToken = async (
+    req: Request<{}, {}, { token: string }>,
+    res: Response,
+  ) => {
+    try {
+      const { token } = req.body;
+      const tokenExists = await Token.findOne({
+        token,
+      });
+      if (!tokenExists) throw new AppError("INVALID_TOKEN");
+      res.success(null, 200);
+    } catch (err) {
+      if (err instanceof AppError) throw err;
+      throw new AppError("DB_CONSULT_ERROR");
+    }
+  };
+
+  static updatePasswordWithToken = async (
+    req: Request<{ token: string }, {}, { password: string }>,
+    res: Response,
+  ) => {
+    try {
+      const { token } = req.params;
+      const { password } = req.body;
+      const tokenExists = await Token.findOne({
+        token,
+      });
+      if (!tokenExists) throw new AppError("INVALID_TOKEN");
+
+      const user = await User.findById(tokenExists.user);
+      if (!user) throw new AppError("USER_NOT_FOUND");
+
+      user.password = await AuthUtils.hashPassword(password);
       await Promise.allSettled([user.save(), tokenExists.deleteOne()]);
 
       res.success(null, 200);

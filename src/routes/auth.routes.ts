@@ -3,8 +3,10 @@ import { validateRequest } from "@/middlewares";
 import {
   loginValidator,
   registerValidator,
-  requestCodeValidator,
+  emailValidator,
   tokenValidator,
+  passwordValidator,
+  changePassValidator,
 } from "@/validators/auth.validator";
 import { Router } from "express";
 
@@ -19,7 +21,7 @@ router.post(
 
 router.post(
   "/request-code",
-  requestCodeValidator,
+  emailValidator,
   validateRequest,
   AuthController.requestConfirmationCode,
 );
@@ -29,6 +31,27 @@ router.post(
   tokenValidator,
   validateRequest,
   AuthController.confirmAccount,
+);
+
+router.post(
+  "/forgot-password",
+  emailValidator,
+  validateRequest,
+  AuthController.forgotPassword,
+);
+
+router.post(
+  "/validate-token",
+  tokenValidator,
+  validateRequest,
+  AuthController.validateToken,
+);
+
+router.post(
+  "/update-password/:token",
+  changePassValidator,
+  validateRequest,
+  AuthController.updatePasswordWithToken,
 );
 
 router.post("/login", loginValidator, validateRequest, AuthController.login);

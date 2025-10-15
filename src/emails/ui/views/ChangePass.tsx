@@ -14,9 +14,14 @@ import { APP_NAME } from "../../core/env.config";
 type ChangePassProps = {
   name?: string;
   changePassLink: string;
+  sixDigitCode: string;
 };
 
-export default function ChangePass({ name, changePassLink }: ChangePassProps) {
+export default function ChangePass({
+  name,
+  changePassLink,
+  sixDigitCode,
+}: ChangePassProps) {
   return (
     <Html lang="es">
       <Head />
@@ -33,8 +38,20 @@ export default function ChangePass({ name, changePassLink }: ChangePassProps) {
               </Text>
               <Text className="mb-4">
                 Recibimos una solicitud para cambiar la contraseña de tu cuenta
-                en {APP_NAME}. Si fuiste tú, haz clic en el botón de abajo para
-                actualizar tu contraseña.
+                en <b>{APP_NAME}</b>. Si fuiste tú, copia el siguiente código para
+                actualizar tu contraseña:
+              </Text>
+
+              <Section className="text-center">
+                <Text className="inline-block px-6 py-1 mb-10 text-3xl font-semibold tracking-wider text-center text-white bg-black rounded-lg ">
+                  {sixDigitCode}
+                </Text>
+              </Section>
+
+              <Text className="my-2 text-sm">
+                Luego, haz click en el botón debajo y digita este código en la
+                página de cambio de contraseña:
+                <br />
               </Text>
 
               <Section className="my-8 text-center">
@@ -42,13 +59,14 @@ export default function ChangePass({ name, changePassLink }: ChangePassProps) {
                   href={changePassLink}
                   className="px-4 py-2 font-medium text-white bg-purple-600 rounded-lg"
                 >
-                  Cambiar mi contraseña
+                  Cambiar contraseña
                 </Button>
               </Section>
+
               <Text className="mt-2 text-sm text-gray-600">
                 Si no solicitaste este cambio, ignora este correo.
                 <br />
-                Por seguridad, este enlace expirará en 1 hora.
+                Por seguridad, este enlace expirará en 30 minutos.
               </Text>
               <Text className="mt-6">- El equipo de {APP_NAME}</Text>
             </Section>

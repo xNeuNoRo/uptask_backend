@@ -1,8 +1,10 @@
 import { body, param } from "express-validator";
 
-export const registerValidator = [
-  body("name").notEmpty().withMessage("El nombre es obligatorio"),
+export const emailValidator = [
   body("email").isEmail().withMessage("El email no es válido"),
+];
+
+export const passwordValidator = [
   body("password")
     .isLength({ min: 8 })
     .withMessage("El password debe ser de al menos 8 caracteres"),
@@ -16,12 +18,19 @@ export const registerValidator = [
     }),
 ];
 
-export const requestCodeValidator = [
-  body("email").isEmail().withMessage("El email no es válido"),
+export const registerValidator = [
+  body("name").notEmpty().withMessage("El nombre es obligatorio"),
+  ...emailValidator,
+  ...passwordValidator,
 ];
 
 export const tokenValidator = [
   body("token").notEmpty().withMessage("El token es obligatorio"),
+];
+
+export const changePassValidator = [
+  param("token").isNumeric().withMessage("Token no válido"),
+  ...passwordValidator,
 ];
 
 export const loginValidator = [
