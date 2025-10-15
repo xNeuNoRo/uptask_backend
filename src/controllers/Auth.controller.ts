@@ -5,6 +5,7 @@ import User from "@/models/User.model";
 import Token from "@/models/Token.model";
 import { sendVerificationEmail } from "@/emails/builders/Verification.builder";
 import { sendChangePassEmail } from "@/emails/builders/ChangePass.builder";
+import { JwtUtils } from "@/utils/Jwt";
 
 // let logger = loggerForContext(loggerFor("auth"), {
 //   entityType: "user",
@@ -232,7 +233,12 @@ export class AuthController {
         password,
       );
       if (!isValidPassword) throw new AppError("INVALID_CREDENTIALS");
-      res.success(null, 200);
+
+      const accessToken = JwtUtils.generateToken(
+        { user_id: user.id },
+        "access",
+      );
+      res.success({ accessToken }, 200);
     } catch (err) {
       if (err instanceof AppError) throw err;
       throw new AppError("DB_CONSULT_ERROR");

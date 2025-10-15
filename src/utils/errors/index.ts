@@ -16,6 +16,8 @@ export const ERRORS = {
   },
   ASSET_NOT_FOUND: { http: 404, msg: "Asset no encontrado" },
   TOKEN_NOT_FOUND: { http: 404, msg: "Token no encontrado" },
+  TOKEN_NOT_PROVIDED: { http: 401, msg: "Token no proporcionado" },
   INVALID_TOKEN: { http: 401, msg: "Token inválido o expirado" },
   INVALID_CREDENTIALS: { http: 401, msg: "Credenciales inválidas" },
+  UNATHORIZED: { http: 401, msg: "No autorizado" },
 } as const;

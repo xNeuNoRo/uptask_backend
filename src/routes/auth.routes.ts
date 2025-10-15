@@ -12,6 +12,7 @@ import { Router } from "express";
 
 const router: Router = Router();
 
+// Create a new account
 router.post(
   "/register",
   registerValidator,
@@ -19,6 +20,7 @@ router.post(
   AuthController.createAccount,
 );
 
+// Request account confirmation code
 router.post(
   "/request-code",
   emailValidator,
@@ -26,6 +28,7 @@ router.post(
   AuthController.requestConfirmationCode,
 );
 
+// Confirm account using token
 router.post(
   "/confirm",
   tokenValidator,
@@ -33,6 +36,7 @@ router.post(
   AuthController.confirmAccount,
 );
 
+// Request password reset instructions
 router.post(
   "/forgot-password",
   emailValidator,
@@ -40,6 +44,7 @@ router.post(
   AuthController.forgotPassword,
 );
 
+// Validate password reset token
 router.post(
   "/validate-token",
   tokenValidator,
@@ -47,6 +52,7 @@ router.post(
   AuthController.validateToken,
 );
 
+// Update password using reset token
 router.post(
   "/update-password/:token",
   changePassValidator,

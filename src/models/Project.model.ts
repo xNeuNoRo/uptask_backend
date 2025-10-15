@@ -9,12 +9,14 @@ import {
 
 import type { ITask } from "@/models/Task.model";
 import type { CreateOf } from "@/types/mongoose-utils";
+import { IUser } from "./User.model";
 
 export interface IProject extends Document {
   projectName: string;
   clientName: string;
   description: string;
   tasks: PopulatedDoc<ITask & Document>[];
+  manager: PopulatedDoc<IUser & Document>;
 }
 
 export type ProjectDTO = CreateOf<
@@ -27,6 +29,7 @@ const ProjectSchemaDef: SchemaDefinition = {
   clientName: { type: String, required: true, trim: true },
   description: { type: String, required: true, trim: true },
   tasks: [{ type: Types.ObjectId, ref: "Task" }],
+  manager: { type: Types.ObjectId, ref: "User", required: true },
 };
 
 const ProjectSchema: Schema = new Schema<IProject>(ProjectSchemaDef, {

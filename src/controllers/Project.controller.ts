@@ -5,7 +5,8 @@ import Project, { type ProjectDTO } from "@/models/Project.model";
 import { AppError } from "@/utils";
 
 let logger = loggerForContext(loggerFor("infra"), {
-  entityType: "project",
+  entityType: "user",
+  entityTarget: "project",
   component: "controller",
 });
 
@@ -13,11 +14,14 @@ export class ProjectController {
   static createProject = async (req: Request, res: Response) => {
     const start = Date.now();
     const project = new Project(req.body);
+    project.manager = req.user!.id;
+
     try {
       await project.save();
       res.success(null, 201);
       log(logger, "info", `Project created with ID: ${project.id}`, {
-        entityId: project.id,
+        entityId: req.user!.id.toString(),
+        entityTargetId: project.id.toString(),
         operation: "create",
         status: "success",
         durationMs: Date.now() - start,
@@ -40,12 +44,16 @@ export class ProjectController {
     }
   };
 
-  static getAllProjects = async (_req: Request, res: Response) => {
+  static getAllProjects = async (req: Request, res: Response) => {
     const start = Date.now();
     try {
-      const projects = await Project.find();
+      const projects = await Project.find({
+        // $or operator to include projects where the user is a collaborator too
+        $or: [{ manager: { $in: req.user!.id } }],
+      });
       res.success(projects);
-      log(logger, "info", "Fetched all projects", {
+      log(logger, "info", `Fetched all projects`, {
+        entityId: req.user!.id.toString(),
         operation: "list",
         status: "success",
         durationMs: Date.now() - start,
@@ -57,6 +65,7 @@ export class ProjectController {
         "error",
         "Error fetching projects",
         {
+          entityId: req.user!.id.toString(),
           operation: "list",
           status: "fail",
           errorCode: "DB_CONSULT_ERROR",
@@ -70,13 +79,19 @@ export class ProjectController {
   static getProjectById = async (req: Request, res: Response) => {
     const start = Date.now();
     try {
+      // Ensure the user is the manager of the project
+      // or return 404 to avoid leaking project existence
+      if (req.project.manager!.toString() !== req.user!.id.toString())
+        throw new AppError("PROJECT_NOT_FOUND");
+
       res.success(req.project);
       log(
         logger,
         "info",
         `Fetched project with ID: ${req.project.id.toString()}`,
         {
-          entityId: req.project.id.toString(),
+          entityId: req.user!.id.toString(),
+          entityTargetId: req.project.id.toString(),
           operation: "read",
           status: "success",
           durationMs: Date.now() - start,
@@ -89,7 +104,8 @@ export class ProjectController {
         "error",
         "Error fetching project by ID",
         {
-          entityId: req.project.id.toString(),
+          entityId: req.user!.id.toString(),
+          entityTargetId: req.project.id.toString(),
           operation: "read",
           status: "fail",
           errorCode: "DB_CONSULT_ERROR",
@@ -106,6 +122,11 @@ export class ProjectController {
   ) => {
     const start = Date.now();
     try {
+      // Ensure the user is the manager of the project
+      // or return 404 to avoid leaking project existence
+      if (req.project.manager!.toString() !== req.user!.id.toString())
+        throw new AppError("PROJECT_NOT_FOUND");
+
       req.project.clientName = req.body.clientName;
       req.project.projectName = req.body.projectName;
       req.project.description = req.body.description;
@@ -116,7 +137,8 @@ export class ProjectController {
         "info",
         `Updated project with ID: ${req.project.id.toString()}`,
         {
-          entityId: req.project.id.toString(),
+          entityId: req.user!.id.toString(),
+          entityTargetId: req.project.id.toString(),
           operation: "update",
           status: "success",
           durationMs: Date.now() - start,
@@ -129,7 +151,8 @@ export class ProjectController {
         "error",
         "Error updating project",
         {
-          entityId: req.project.id.toString(),
+          entityId: req.user!.id.toString(),
+          entityTargetId: req.project.id.toString(),
           operation: "update",
           status: "fail",
           errorCode: "DB_CONSULT_ERROR",
@@ -144,6 +167,11 @@ export class ProjectController {
     const start = Date.now();
 
     try {
+      // Ensure the user is the manager of the project
+      // or return 404 to avoid leaking project existence
+      if (req.project.manager!.toString() !== req.user!.id.toString())
+        throw new AppError("PROJECT_NOT_FOUND");
+
       await req.project.deleteOne();
       res.success(null, 204);
       log(
@@ -151,7 +179,8 @@ export class ProjectController {
         "info",
         `Deleted project with ID: ${req.project.id.toString()}`,
         {
-          entityId: req.project.id.toString(),
+          entityId: req.user!.id.toString(),
+          entityTargetId: req.project.id.toString(),
           operation: "delete",
           status: "success",
           durationMs: Date.now() - start,
@@ -164,7 +193,8 @@ export class ProjectController {
         "error",
         "Error deleting project",
         {
-          entityId: req.project.id.toString(),
+          entityId: req.user!.id.toString(),
+          entityTargetId: req.project.id.toString(),
           operation: "delete",
           status: "fail",
           errorCode: "DB_CONSULT_ERROR",

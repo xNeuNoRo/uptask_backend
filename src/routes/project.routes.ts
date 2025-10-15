@@ -12,10 +12,12 @@ import {
   taskValidator,
 } from "@/validators/project.validator";
 import { taskBelongsToProject } from "@/middlewares/task.middleware";
+import { authenticateUser } from "@/middlewares/auth.middleware";
 
 const router: Router = Router();
 
 // Project routes
+router.use(authenticateUser); // All routes below this line require authentication
 
 // Create a new project
 router.post(
