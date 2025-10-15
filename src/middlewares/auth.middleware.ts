@@ -1,3 +1,4 @@
+import { log, loggerFor, loggerForContext } from "@/lib/loggers";
 import User, { IUser } from "@/models/User.model";
 import { AppError } from "@/utils";
 import { JwtUtils } from "@/utils/Jwt";
@@ -10,6 +11,11 @@ declare global {
     }
   }
 }
+
+const logger = loggerForContext(loggerFor("auth"), {
+  component: "api",
+  entityType: "user",
+});
 
 export const authenticateUser = async (
   req: Request,
@@ -33,6 +39,13 @@ export const authenticateUser = async (
     next();
   } catch (err) {
     if (err instanceof AppError) throw err;
+    log(
+      logger,
+      "error",
+      "Error authenticating user",
+      { operation: "read", status: "fail", errorCode: "INVALID_TOKEN" },
+      { err },
+    );
     throw new AppError("INVALID_TOKEN");
   }
 };

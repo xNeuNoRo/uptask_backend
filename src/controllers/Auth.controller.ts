@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { loggerFor, loggerForContext } from "@/lib/loggers";
+import { log, loggerFor, loggerForContext } from "@/lib/loggers";
 import { AppError, AuthUtils } from "@/utils";
 import User from "@/models/User.model";
 import Token from "@/models/Token.model";
@@ -7,16 +7,17 @@ import { sendVerificationEmail } from "@/emails/builders/Verification.builder";
 import { sendChangePassEmail } from "@/emails/builders/ChangePass.builder";
 import { JwtUtils } from "@/utils/Jwt";
 
-// let logger = loggerForContext(loggerFor("auth"), {
-//   entityType: "user",
-//   component: "controller",
-// });
+let logger = loggerForContext(loggerFor("auth"), {
+  entityType: "user",
+  component: "controller",
+});
 
 export class AuthController {
   static createAccount = async (
     req: Request<{}, {}, { email: string; password: string }>,
     res: Response,
   ) => {
+    const start = Date.now();
     try {
       const { email, password } = req.body;
 
@@ -33,8 +34,14 @@ export class AuthController {
         user: user.id,
         expiresAt: Date.now() + 1800000, // 30 minutes
       });
-
       await Promise.allSettled([user.save(), token.save()]);
+
+      log(logger, "info", "User created with ID: " + user.id, {
+        entityId: user.id.toString(),
+        operation: "create",
+        status: "success",
+        durationMs: Date.now() - start,
+      });
       res.success(null, 201);
 
       sendVerificationEmail({
@@ -44,6 +51,13 @@ export class AuthController {
       });
     } catch (err) {
       if (err instanceof AppError) throw err;
+      log(
+        logger,
+        "error",
+        "Error creating user account",
+        { operation: "create", status: "fail", errorCode: "DB_CONSULT_ERROR" },
+        { err },
+      );
       throw new AppError("DB_CONSULT_ERROR");
     }
   };
@@ -52,6 +66,7 @@ export class AuthController {
     req: Request<{}, {}, { email: string }>,
     res: Response,
   ) => {
+    const start = Date.now();
     try {
       const { email } = req.body;
 
@@ -72,8 +87,14 @@ export class AuthController {
         user: user.id,
         expiresAt: Date.now() + 1800000, // 30 minutes
       });
-
       await token.save();
+
+      log(logger, "info", "Verification code sent to user ID: " + user.id, {
+        entityId: user.id.toString(),
+        operation: "create",
+        status: "success",
+        durationMs: Date.now() - start,
+      });
       res.success(null, 200);
 
       sendVerificationEmail({
@@ -83,6 +104,13 @@ export class AuthController {
       });
     } catch (err) {
       if (err instanceof AppError) throw err;
+      log(
+        logger,
+        "error",
+        "Error sending verification code",
+        { operation: "create", status: "fail", errorCode: "DB_CONSULT_ERROR" },
+        { err },
+      );
       throw new AppError("DB_CONSULT_ERROR");
     }
   };
@@ -91,6 +119,7 @@ export class AuthController {
     req: Request<{}, {}, { email: string }>,
     res: Response,
   ) => {
+    const start = Date.now();
     try {
       const { email } = req.body;
 
@@ -111,9 +140,14 @@ export class AuthController {
         user: user.id,
         expiresAt: Date.now() + 1800000, // 30 minutes
       });
-
       await token.save();
 
+      log(logger, "info", "Password reset code sent to user ID: " + user.id, {
+        entityId: user.id.toString(),
+        operation: "send",
+        status: "success",
+        durationMs: Date.now() - start,
+      });
       res.success(null, 200);
 
       sendChangePassEmail({
@@ -124,6 +158,13 @@ export class AuthController {
       });
     } catch (err) {
       if (err instanceof AppError) throw err;
+      log(
+        logger,
+        "error",
+        "Error sending change password instructions",
+        { operation: "send", status: "fail", errorCode: "DB_CONSULT_ERROR" },
+        { err },
+      );
       throw new AppError("DB_CONSULT_ERROR");
     }
   };
@@ -132,6 +173,7 @@ export class AuthController {
     req: Request<{}, {}, { token: string }>,
     res: Response,
   ) => {
+    const start = Date.now();
     try {
       const { token } = req.body;
       const tokenExists = await Token.findOne({
@@ -143,12 +185,24 @@ export class AuthController {
       const user = await User.findById(tokenExists.user);
       if (!user) throw new AppError("USER_NOT_FOUND");
       user.confirmed = true;
-
       await Promise.allSettled([user.save(), tokenExists.deleteOne()]);
 
+      log(logger, "info", "User confirmed account with ID: " + user.id, {
+        entityId: user.id.toString(),
+        operation: "update",
+        status: "success",
+        durationMs: Date.now() - start,
+      });
       res.success(null, 200);
     } catch (err) {
       if (err instanceof AppError) throw err;
+      log(
+        logger,
+        "error",
+        "Error confirming account",
+        { operation: "update", status: "fail", errorCode: "DB_CONSULT_ERROR" },
+        { err },
+      );
       throw new AppError("DB_CONSULT_ERROR");
     }
   };
@@ -157,15 +211,34 @@ export class AuthController {
     req: Request<{}, {}, { token: string }>,
     res: Response,
   ) => {
+    const start = Date.now();
     try {
       const { token } = req.body;
       const tokenExists = await Token.findOne({
         token,
       });
       if (!tokenExists) throw new AppError("INVALID_TOKEN");
+
+      log(logger, "info", "Token validated for user ID: " + tokenExists.user, {
+        entityId: tokenExists.user.toString(),
+        operation: "read",
+        status: "success",
+        durationMs: Date.now() - start,
+      });
       res.success(null, 200);
     } catch (err) {
       if (err instanceof AppError) throw err;
+      log(
+        logger,
+        "error",
+        "Error validating token",
+        {
+          operation: "read",
+          status: "fail",
+          errorCode: "DB_CONSULT_ERROR",
+        },
+        { err },
+      );
       throw new AppError("DB_CONSULT_ERROR");
     }
   };
@@ -174,6 +247,7 @@ export class AuthController {
     req: Request<{ token: string }, {}, { password: string }>,
     res: Response,
   ) => {
+    const start = Date.now();
     try {
       const { token } = req.params;
       const { password } = req.body;
@@ -188,9 +262,26 @@ export class AuthController {
       user.password = await AuthUtils.hashPassword(password);
       await Promise.allSettled([user.save(), tokenExists.deleteOne()]);
 
+      log(logger, "info", "User updated password with ID: " + user.id, {
+        entityId: user.id.toString(),
+        operation: "update",
+        status: "success",
+        durationMs: Date.now() - start,
+      });
       res.success(null, 200);
     } catch (err) {
       if (err instanceof AppError) throw err;
+      log(
+        logger,
+        "error",
+        "Error updating password with token",
+        {
+          operation: "update",
+          status: "fail",
+          errorCode: "DB_CONSULT_ERROR",
+        },
+        { err },
+      );
       throw new AppError("DB_CONSULT_ERROR");
     }
   };
@@ -199,6 +290,7 @@ export class AuthController {
     req: Request<{}, {}, { email: string; password: string }>,
     res: Response,
   ) => {
+    const start = Date.now();
     try {
       const { email, password } = req.body;
 
@@ -238,9 +330,27 @@ export class AuthController {
         { user_id: user.id },
         "access",
       );
+
+      log(logger, "info", "User logged in with ID: " + user.id, {
+        entityId: user.id.toString(),
+        operation: "read",
+        status: "success",
+        durationMs: Date.now() - start,
+      });
       res.success({ accessToken }, 200);
     } catch (err) {
       if (err instanceof AppError) throw err;
+      log(
+        logger,
+        "error",
+        "Error during login attempt",
+        {
+          operation: "read",
+          status: "fail",
+          errorCode: "DB_CONSULT_ERROR",
+        },
+        { err },
+      );
       throw new AppError("DB_CONSULT_ERROR");
     }
   };
