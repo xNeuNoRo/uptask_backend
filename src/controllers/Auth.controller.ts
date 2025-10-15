@@ -57,7 +57,7 @@ export class AuthController {
         token,
         type: "verifyEmail",
       });
-      if (!tokenExists) throw new AppError("TOKEN_NOT_FOUND");
+      if (!tokenExists) throw new AppError("INVALID_TOKEN");
 
       const user = await User.findById(tokenExists.user);
       if (!user) throw new AppError("USER_NOT_FOUND");
