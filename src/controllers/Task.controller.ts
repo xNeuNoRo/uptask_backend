@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 
 import { log, loggerFor, loggerForContext } from "@/lib/loggers";
-import Task, { type TaskDTO } from "@/models/task.model";
+import Task, { type TaskDTO } from "@/models/Task.model";
 import { AppError } from "@/utils";
 
 const logger = loggerForContext(loggerFor("tasks"), {
@@ -11,7 +11,7 @@ const logger = loggerForContext(loggerFor("tasks"), {
 
 export class TaskController {
   static createTask = async (
-    req: Request<object, object, Omit<TaskDTO, "project">>,
+    req: Request<object, object, Pick<TaskDTO, "name" | "description">>,
     res: Response,
   ) => {
     const start = Date.now();
@@ -107,7 +107,7 @@ export class TaskController {
   };
 
   static updateTask = async (
-    req: Request<{}, object, Omit<TaskDTO, "project">>,
+    req: Request<{}, object, Pick<TaskDTO, "name" | "description">>,
     res: Response,
   ) => {
     const start = Date.now();

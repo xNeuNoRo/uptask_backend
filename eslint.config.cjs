@@ -12,10 +12,12 @@ module.exports = [
     ignores: [
       "node_modules/**",
       "dist/**",
+      "public/**",
       "coverage/**",
       "*.cjs",
       "*.mjs",
       "*.js",
+      "src/emails/**/*.js",
     ],
   },
 

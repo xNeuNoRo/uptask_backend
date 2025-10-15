@@ -1,14 +1,14 @@
-import { taskStatus } from "@/models/task.model";
-import { check, param } from "express-validator";
+import { taskStatus } from "@/models/Task.model";
+import { body, param } from "express-validator";
 
 export const projectValidator = [
-  check("projectName")
+  body("projectName")
     .notEmpty()
     .withMessage("El nombre del proyecto es obligatorio"),
-  check("clientName")
+  body("clientName")
     .notEmpty()
     .withMessage("El nombre del cliente es obligatorio"),
-  check("description").notEmpty().withMessage("La descripción es obligatoria"),
+  body("description").notEmpty().withMessage("La descripción es obligatoria"),
 ];
 
 export const projectIdValidator = [
@@ -16,8 +16,8 @@ export const projectIdValidator = [
 ];
 
 export const taskValidator = [
-  check("name").notEmpty().withMessage("El nombre de la tarea es obligatorio"),
-  check("description")
+  body("name").notEmpty().withMessage("El nombre de la tarea es obligatorio"),
+  body("description")
     .notEmpty()
     .withMessage("La descripción de la tarea es obligatoria"),
 ];
@@ -27,7 +27,7 @@ export const taskIdValidator = [
 ];
 
 export const taskStatusValidator = [
-  check("status")
+  body("status")
     .notEmpty()
     .withMessage("El estado de la tarea es obligatorio")
     .isIn(Object.values(taskStatus))

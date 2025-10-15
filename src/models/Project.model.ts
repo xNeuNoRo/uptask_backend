@@ -7,7 +7,7 @@ import {
   type PopulatedDoc,
 } from "mongoose";
 
-import type { ITask } from "@/models/task.model";
+import type { ITask } from "@/models/Task.model";
 import type { CreateOf } from "@/types/mongoose-utils";
 
 export interface IProject extends Document {

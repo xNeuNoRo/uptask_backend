@@ -12,6 +12,8 @@ export const corsConfig: CorsOptions = {
     if (whitelist.includes(origin)) {
       callback(null, true);
     } else {
+      if (!origin && process.env.NODE_ENV === "development")
+        return callback(null, true);
       callback(null, false);
       log(
         logger,

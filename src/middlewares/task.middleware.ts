@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from "express";
 
 import { log, loggerFor, loggerForContext } from "@/lib/loggers";
-import Task, { type ITask } from "@/models/task.model";
+import Task, { type ITask } from "@/models/Task.model";
 import { AppError } from "@/utils";
 
 declare global {

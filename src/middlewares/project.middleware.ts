@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from "express";
 
 import { log, loggerFor, loggerForContext } from "@/lib/loggers";
-import Project, { type IProject } from "@/models/project.model";
+import Project, { type IProject } from "@/models/Project.model";
 import { AppError } from "@/utils";
 
 declare global {

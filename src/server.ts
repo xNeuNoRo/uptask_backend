@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { createApp } from "@/app";
 import { connectDB } from "@/config/db";
 import { log, loggerFor, loggerForContext } from "@/lib/loggers";

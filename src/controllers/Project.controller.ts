@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 
 import { log, loggerFor, loggerForContext } from "@/lib/loggers";
-import Project, { type ProjectDTO } from "@/models/project.model";
+import Project, { type ProjectDTO } from "@/models/Project.model";
 import { AppError } from "@/utils";
 
 let logger = loggerForContext(loggerFor("infra"), {
