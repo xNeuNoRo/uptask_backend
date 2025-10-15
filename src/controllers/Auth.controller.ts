@@ -38,7 +38,7 @@ export class AuthController {
       // Simular de momento el correo verificado
       sendVerificationEmail({
         to: user.email,
-        verificationLink: `${process.env.FRONTEND_URL}/confirm`,
+        verificationLink: `${process.env.FRONTEND_URL}/auth/confirm`,
         sixDigitCode,
       });
     } catch (err) {
