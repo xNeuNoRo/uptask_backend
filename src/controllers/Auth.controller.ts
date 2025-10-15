@@ -24,9 +24,9 @@ export class AuthController {
       const user = new User(req.body);
       user.password = await AuthUtils.hashPassword(password);
 
-      const { token: vToken, hash } = AuthUtils.generateToken();
+      const sixDigitCode = AuthUtils.generate6DigitToken();
       const token = new Token({
-        token: hash,
+        token: sixDigitCode,
         type: "verifyEmail",
         user: user.id,
         expiresAt: Date.now() + 1800000, // 30 minutes
@@ -38,7 +38,8 @@ export class AuthController {
       // Simular de momento el correo verificado
       sendVerificationEmail({
         to: user.email,
-        verificationLink: `${process.env.FRONTEND_URL}/verify/?token=${vToken}`,
+        verificationLink: `${process.env.FRONTEND_URL}/confirm`,
+        sixDigitCode,
       });
     } catch (err) {
       if (err instanceof AppError) throw err;
@@ -53,7 +54,7 @@ export class AuthController {
     try {
       const { token } = req.body;
       const tokenExists = await Token.findOne({
-        token: AuthUtils.hashToken(token),
+        token,
         type: "verifyEmail",
       });
       if (!tokenExists) throw new AppError("TOKEN_NOT_FOUND");
@@ -87,9 +88,9 @@ export class AuthController {
           type: "verifyEmail",
         });
 
-        const { token: vToken, hash } = AuthUtils.generateToken();
+        const sixDigitCode = AuthUtils.generate6DigitToken();
         const token = new Token({
-          token: hash,
+          token: sixDigitCode,
           type: "verifyEmail",
           user: user.id,
           expiresAt: Date.now() + 1800000, // 30 minutes
@@ -97,7 +98,8 @@ export class AuthController {
         await token.save();
         sendVerificationEmail({
           to: user.email,
-          verificationLink: `${process.env.FRONTEND_URL}/verify/?token=${vToken}`,
+          verificationLink: `${process.env.FRONTEND_URL}/confirm`,
+          sixDigitCode,
         });
 
         throw new AppError("USER_NOT_CONFIRMED");

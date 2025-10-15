@@ -6,9 +6,13 @@ import { MailUtils } from "@/emails/core/mail";
 export async function sendVerificationEmail(params: {
   to: string;
   verificationLink: string;
+  sixDigitCode: string;
 }) {
   const view = await render(
-    <Verification verificationLink={params.verificationLink} />,
+    <Verification
+      verificationLink={params.verificationLink}
+      sixDigitCode={params.sixDigitCode}
+    />,
   );
   return MailUtils.sendMail({
     to: params.to,
