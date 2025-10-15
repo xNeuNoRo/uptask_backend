@@ -3,6 +3,11 @@ import nodemailer, { Transporter } from "nodemailer";
 import colors from "colors";
 import SMTPTransport from "nodemailer/lib/smtp-transport";
 import Mail from "nodemailer/lib/mailer";
+import { log, loggerFor, loggerForContext } from "@/lib/loggers";
+
+const logger = loggerForContext(loggerFor("infra"), {
+  component: "email",
+});
 
 export class MailUtils {
   static readonly transporter: Transporter<SMTPTransport.SentMessageInfo> =
@@ -43,7 +48,6 @@ export class MailUtils {
         this.countRecipients(opts.to) +
         this.countRecipients(opts.cc) +
         this.countRecipients(opts.bcc);
-      const totalTime = Date.now() - start;
 
       const status =
         accepted > 0 && rejected === 0
@@ -58,18 +62,31 @@ export class MailUtils {
             ? colors.yellow
             : colors.red;
 
-      console.log(
-        color(
-          `[MAILER] Se envió ${status}: ${accepted}/${totalSubjects || accepted} destinatario(s) (~${totalTime}ms)`,
-        ),
+      const totalTime = Date.now() - start;
+      log(
+        logger,
+        "info",
+        `Email sent ${status}: ${accepted}/${totalSubjects || accepted} recipient(s) (~${totalTime}ms)`,
+        {
+          operation: "send",
+          status: accepted > 0 ? "success" : "fail",
+          durationMs: totalTime,
+        },
       );
       return info;
     } catch (err) {
       const totalTime = Date.now() - start;
-      console.error(
-        colors.red(
-          `[MAILER] Ha ocurrido un error al enviar un mail (~${totalTime}ms): ${err instanceof Error ? err?.message : err}`,
-        ),
+      log(
+        logger,
+        "error",
+        `Error sending email (~${totalTime}ms)`,
+        {
+          operation: "send",
+          status: "fail",
+          errorCode: "EMAIL_SEND_ERROR",
+          durationMs: totalTime,
+        },
+        { err },
       );
       throw err;
     }

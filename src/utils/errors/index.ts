@@ -4,6 +4,7 @@ export const ERRORS = {
   PROJECT_NOT_FOUND: { http: 404, msg: "Proyecto no encontrado" },
   TASK_NOT_FOUND: { http: 404, msg: "Tarea no encontrada" },
   DB_CONSULT_ERROR: { http: 503, msg: "Error consultando la base de datos" },
+  EMAIL_SEND_ERROR: { http: 503, msg: "Error enviando el correo" },
   USER_ALREADY_EXISTS: { http: 409, msg: "El usuario ya existe" },
   USER_ALREADY_CONFIRMED: {
     http: 403,
