@@ -57,6 +57,12 @@ export class AuthController {
       if (!user) throw new AppError("USER_NOT_FOUND");
       if (user.confirmed) throw new AppError("USER_ALREADY_CONFIRMED");
 
+      // Delete all verifyEmail tokens for this user
+      await Token.deleteMany({
+        user: user.id,
+        type: "verifyEmail",
+      });
+
       const sixDigitCode = AuthUtils.generate6DigitToken();
       const token = new Token({
         token: sixDigitCode,
@@ -130,7 +136,7 @@ export class AuthController {
         await token.save();
         sendVerificationEmail({
           to: user.email,
-          verificationLink: `${process.env.FRONTEND_URL}/confirm`,
+          verificationLink: `${process.env.FRONTEND_URL}/auth/confirm`,
           sixDigitCode,
         });
 
