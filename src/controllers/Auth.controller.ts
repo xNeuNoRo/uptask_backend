@@ -35,7 +35,39 @@ export class AuthController {
       await Promise.allSettled([user.save(), token.save()]);
       res.success(null, 201);
 
-      // Simular de momento el correo verificado
+      sendVerificationEmail({
+        to: user.email,
+        verificationLink: `${process.env.FRONTEND_URL}/auth/confirm`,
+        sixDigitCode,
+      });
+    } catch (err) {
+      if (err instanceof AppError) throw err;
+      throw new AppError("DB_CONSULT_ERROR");
+    }
+  };
+
+  static requestConfirmationCode = async (
+    req: Request<{}, {}, { email: string }>,
+    res: Response,
+  ) => {
+    try {
+      const { email } = req.body;
+
+      const user = await User.findOne({ email });
+      if (!user) throw new AppError("USER_NOT_FOUND");
+      if (user.confirmed) throw new AppError("USER_ALREADY_CONFIRMED");
+
+      const sixDigitCode = AuthUtils.generate6DigitToken();
+      const token = new Token({
+        token: sixDigitCode,
+        type: "verifyEmail",
+        user: user.id,
+        expiresAt: Date.now() + 1800000, // 30 minutes
+      });
+
+      await token.save();
+      res.success(null, 201);
+
       sendVerificationEmail({
         to: user.email,
         verificationLink: `${process.env.FRONTEND_URL}/auth/confirm`,

@@ -16,6 +16,10 @@ export const registerValidator = [
     }),
 ];
 
+export const requestCodeValidator = [
+  body("email").isEmail().withMessage("El email no es válido"),
+];
+
 export const tokenValidator = [
   body("token").notEmpty().withMessage("El token es obligatorio"),
 ];

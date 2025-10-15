@@ -3,6 +3,7 @@ import { validateRequest } from "@/middlewares";
 import {
   loginValidator,
   registerValidator,
+  requestCodeValidator,
   tokenValidator,
 } from "@/validators/auth.validator";
 import { Router } from "express";
@@ -14,6 +15,13 @@ router.post(
   registerValidator,
   validateRequest,
   AuthController.createAccount,
+);
+
+router.post(
+  "/request-code",
+  requestCodeValidator,
+  validateRequest,
+  AuthController.requestConfirmationCode,
 );
 
 router.post(
