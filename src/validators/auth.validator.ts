@@ -36,4 +36,5 @@ export const changePassValidator = [
 export const loginValidator = [
   body("email").isEmail().withMessage("El email no es válido"),
   body("password").notEmpty().withMessage("El password es obligatorio"),
+  body("remember").isBoolean().withMessage("El campo 'remember' no es válido"),
 ];

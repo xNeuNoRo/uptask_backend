@@ -1,5 +1,6 @@
 import express, { type Express } from "express";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 
 import { error, success, httpLogger } from "@/middlewares";
 import { registerRoutes } from "@/routes";
@@ -43,6 +44,7 @@ export function createApp(): Express {
   // Global middlewares
   app.use(httpLogger);
   app.use(express.json());
+  app.use(cookieParser());
   app.use(success);
 
   // Register routes

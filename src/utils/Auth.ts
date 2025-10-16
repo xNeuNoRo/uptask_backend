@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import argon2 from "argon2";
 import { HASH_PROFILE } from "@/config/argon";
+import { CookieOptions, Request, Response } from "express";
 
 export class AuthUtils {
   static async hashPassword(plain: string) {
@@ -27,5 +28,35 @@ export class AuthUtils {
     const token = crypto.randomBytes(32).toString("hex");
     const hash = this.hashToken(token);
     return { token, hash };
+  }
+
+  static setAuthCookie(
+    req: Request,
+    res: Response,
+    refreshToken: string,
+    remember: boolean,
+  ) {
+    const exp = remember
+      ? Number(process.env.REFRESH_TTL_LONG) * 1000
+      : Number(process.env.REFRESH_TTL_SHORT) * 1000;
+
+    const options: CookieOptions = {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      maxAge: exp,
+      path: req.baseUrl,
+    };
+
+    return res.cookie("refresh_token", refreshToken, options);
+  }
+
+  static clearAuthCookie(req: Request, res: Response) {
+    return res.clearCookie("refresh_token", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      path: req.baseUrl,
+    });
   }
 }

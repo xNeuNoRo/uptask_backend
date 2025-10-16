@@ -26,4 +26,5 @@ export const corsConfig: CorsOptions = {
       );
     }
   },
+  credentials: true,
 };

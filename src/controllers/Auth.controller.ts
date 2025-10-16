@@ -287,12 +287,16 @@ export class AuthController {
   };
 
   static login = async (
-    req: Request<{}, {}, { email: string; password: string }>,
+    req: Request<
+      {},
+      {},
+      { email: string; password: string; remember: boolean }
+    >,
     res: Response,
   ) => {
     const start = Date.now();
     try {
-      const { email, password } = req.body;
+      const { email, password, remember } = req.body;
 
       const user = await User.findOne({ email });
       if (!user) throw new AppError("USER_NOT_FOUND");
@@ -327,10 +331,17 @@ export class AuthController {
       if (!isValidPassword) throw new AppError("INVALID_CREDENTIALS");
 
       const accessToken = JwtUtils.generateToken(
-        { user_id: user.id },
+        { user_id: user.id, type: "access" },
         "access",
       );
 
+      const refreshTTL = remember ? "refresh_long" : "refresh_short";
+      const refreshToken = JwtUtils.generateToken(
+        { user_id: user.id, type: refreshTTL },
+        refreshTTL,
+      );
+
+      AuthUtils.setAuthCookie(req, res, refreshToken, remember);
       log(logger, "info", "User logged in with ID: " + user.id, {
         entityId: user.id.toString(),
         operation: "read",
@@ -353,5 +364,70 @@ export class AuthController {
       );
       throw new AppError("DB_CONSULT_ERROR");
     }
+  };
+
+  static refreshToken = async (req: Request, res: Response) => {
+    try {
+      const token = req.cookies?.refresh_token;
+      if (!token) throw new AppError("TOKEN_NOT_PROVIDED");
+
+      const decoded = JwtUtils.verifyToken(token);
+      if (!decoded || !decoded.user_id) throw new AppError("INVALID_TOKEN");
+
+      const user = await User.findById(decoded.user_id).select("_id");
+      if (!user) throw new AppError("USER_NOT_FOUND");
+
+      const accessToken = JwtUtils.generateToken(
+        { user_id: user.id, type: "access" },
+        "access",
+      );
+      const refreshToken = JwtUtils.generateToken(
+        { user_id: user.id, type: decoded.type },
+        decoded.type ?? "refresh_short",
+      );
+
+      AuthUtils.setAuthCookie(
+        req,
+        res,
+        refreshToken,
+        decoded.remember ?? false,
+      );
+      log(logger, "info", "Refreshed tokens for user ID: " + user.id, {
+        entityId: user.id.toString(),
+        operation: "read",
+        status: "success",
+      });
+      res.success({ accessToken }, 200);
+    } catch (err) {
+      AuthUtils.clearAuthCookie(req, res);
+      if (err instanceof AppError) throw err;
+      log(
+        logger,
+        "error",
+        "Error refreshing access token",
+        { operation: "read", status: "fail", errorCode: "DB_CONSULT_ERROR" },
+        { err },
+      );
+      throw new AppError("DB_CONSULT_ERROR");
+    }
+  };
+
+  static logout = async (req: Request, res: Response) => {
+    AuthUtils.clearAuthCookie(req, res);
+    log(logger, "info", "User logged out with ID: " + req.user?.id, {
+      entityId: req.user?.id.toString(),
+      operation: "delete",
+      status: "success",
+    });
+    res.success(null, 200);
+  };
+
+  static getUser = async (req: Request, res: Response) => {
+    log(logger, "info", "Fetched authenticated user info", {
+      entityId: req.user?.id.toString(),
+      operation: "read",
+      status: "success",
+    });
+    res.success({ user: req.user }, 200);
   };
 }

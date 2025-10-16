@@ -47,6 +47,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
     "@react-email/preview-server": "4.3.0",
+    "@types/cookie-parser": "^1.4.9",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
     "@types/jest": "^30.0.0",
@@ -84,6 +85,7 @@
     "argon2": "^0.44.0",
     "colorette": "^2.0.20",
     "colors": "^1.4.0",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",
     "express": "^5.1.0",

@@ -1,5 +1,6 @@
 import { AuthController } from "@/controllers/Auth.controller";
 import { validateRequest } from "@/middlewares";
+import { authenticateUser } from "@/middlewares/auth.middleware";
 import {
   loginValidator,
   registerValidator,
@@ -60,6 +61,16 @@ router.post(
   AuthController.updatePasswordWithToken,
 );
 
+// Login to the application
 router.post("/login", loginValidator, validateRequest, AuthController.login);
+
+// Refresh access token
+router.post("/refresh", AuthController.refreshToken);
+
+// Logout from the application
+router.post("/logout", authenticateUser, AuthController.logout);
+
+// Get authenticated user info
+router.get("/user", authenticateUser, AuthController.getUser);
 
 export default router;

@@ -11,6 +11,8 @@ const secret = process.env.JWT_SECRET;
 
 type UserPayload = {
   user_id: Types.ObjectId;
+  type?: keyof typeof expiresType;
+  remember?: boolean;
 };
 
 export class JwtUtils {
