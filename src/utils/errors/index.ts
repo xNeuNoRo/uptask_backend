@@ -15,6 +15,12 @@ export const ERRORS = {
     http: 403,
     msg: "Usuario no verificado. Se ha enviado un nuevo correo de verificacion, revisa tu bandeja de entrada",
   },
+  USER_NOT_IN_TEAM: { http: 404, msg: "El usuario no pertenece al equipo" },
+  USER_ALREADY_IN_TEAM: { http: 409, msg: "El usuario ya pertenece al equipo" },
+  CANNOT_ADD_MANAGER_TO_TEAM: {
+    http: 409,
+    msg: "No se puede añadir el gestor del proyecto al equipo",
+  },
   ASSET_NOT_FOUND: { http: 404, msg: "Asset no encontrado" },
   TOKEN_NOT_FOUND: { http: 404, msg: "Token no encontrado" },
   TOKEN_NOT_PROVIDED: { http: 401, msg: "Token no proporcionado" },

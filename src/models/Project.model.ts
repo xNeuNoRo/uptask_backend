@@ -17,6 +17,7 @@ export interface IProject extends Document {
   description: string;
   tasks: PopulatedDoc<ITask & Document>[];
   manager: PopulatedDoc<IUser & Document>;
+  team: PopulatedDoc<IUser & Document>[];
 }
 
 export type ProjectDTO = CreateOf<
@@ -30,6 +31,7 @@ const ProjectSchemaDef: SchemaDefinition = {
   description: { type: String, required: true, trim: true },
   tasks: [{ type: Types.ObjectId, ref: "Task" }],
   manager: { type: Types.ObjectId, ref: "User", required: true },
+  team: [{ type: Types.ObjectId, ref: "User" }],
 };
 
 const ProjectSchema: Schema = new Schema<IProject>(ProjectSchemaDef, {

@@ -1,11 +1,10 @@
 import { Request, Response } from "express";
 import { log, loggerFor, loggerForContext } from "@/lib/loggers";
-import { AppError, AuthUtils } from "@/utils";
+import { AppError, AuthUtils, JwtUtils } from "@/utils";
 import User from "@/models/User.model";
 import Token from "@/models/Token.model";
 import { sendVerificationEmail } from "@/emails/builders/Verification.builder";
 import { sendChangePassEmail } from "@/emails/builders/ChangePass.builder";
-import { JwtUtils } from "@/utils/Jwt";
 
 let logger = loggerForContext(loggerFor("auth"), {
   entityType: "user",

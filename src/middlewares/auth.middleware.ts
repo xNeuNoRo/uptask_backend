@@ -1,7 +1,6 @@
 import { log, loggerFor, loggerForContext } from "@/lib/loggers";
 import User, { IUser } from "@/models/User.model";
-import { AppError } from "@/utils";
-import { JwtUtils } from "@/utils/Jwt";
+import { AppError, JwtUtils } from "@/utils";
 import { NextFunction, Request, Response } from "express";
 
 declare global {

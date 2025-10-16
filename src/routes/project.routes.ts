@@ -13,6 +13,8 @@ import {
 } from "@/validators/project.validator";
 import { taskBelongsToProject } from "@/middlewares/task.middleware";
 import { authenticateUser } from "@/middlewares/auth.middleware";
+import { emailValidator, userIdValidator } from "@/validators/team.validator";
+import { TeamMemberController } from "@/controllers/Team.controller";
 
 const router: Router = Router();
 
@@ -95,12 +97,37 @@ router.delete(
   TaskController.deleteTask,
 );
 
+// Update task status
 router.post(
   "/:projectId/tasks/:taskId/status",
   taskIdValidator,
   taskStatusValidator,
   validateRequest,
   TaskController.updateTaskStatus,
+);
+
+/* Routes for teams */
+router.get("/:projectId/team", TeamMemberController.getProjectTeam);
+
+router.post(
+  "/:projectId/team/find",
+  emailValidator,
+  validateRequest,
+  TeamMemberController.findMemberByEmail,
+);
+
+router.post(
+  "/:projectId/team",
+  userIdValidator,
+  validateRequest,
+  TeamMemberController.addUserById,
+);
+
+router.delete(
+  "/:projectId/team",
+  userIdValidator,
+  validateRequest,
+  TeamMemberController.removeUserById,
 );
 
 export default router;
