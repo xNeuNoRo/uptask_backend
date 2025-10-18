@@ -13,7 +13,11 @@ import {
 } from "@/validators/project.validator";
 import { taskBelongsToProject } from "@/middlewares/task.middleware";
 import { authenticateUser } from "@/middlewares/auth.middleware";
-import { emailValidator, userIdValidator } from "@/validators/team.validator";
+import {
+  emailValidator,
+  idValidator,
+  userIdValidator,
+} from "@/validators/team.validator";
 import { TeamMemberController } from "@/controllers/Team.controller";
 
 const router: Router = Router();
@@ -118,13 +122,13 @@ router.post(
 
 router.post(
   "/:projectId/team",
-  userIdValidator,
+  idValidator,
   validateRequest,
   TeamMemberController.addUserById,
 );
 
 router.delete(
-  "/:projectId/team",
+  "/:projectId/team/:userId",
   userIdValidator,
   validateRequest,
   TeamMemberController.removeUserById,

@@ -53,18 +53,15 @@ export class TeamMemberController {
     }
   }
 
-  static async removeUserById(
-    req: Request<{}, {}, { id: string }>,
-    res: Response,
-  ) {
-    const { id } = req.body;
+  static async removeUserById(req: Request<{ userId: string }>, res: Response) {
+    const { userId } = req.params;
 
     try {
-      if (!req.project.team!.some((team) => team?.toString() === id))
+      if (!req.project.team!.some((team) => team?.toString() === userId))
         throw new AppError("USER_NOT_IN_TEAM");
 
       req.project.team = req.project.team.filter(
-        (team) => team?.toString() !== id,
+        (team) => team?.toString() !== userId,
       );
       await req.project.save();
 
