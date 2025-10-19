@@ -28,6 +28,7 @@ export interface ITask extends Document {
     status: TaskStatusType;
     changedAt: Date;
   }[];
+  notes: Types.ObjectId[];
 }
 
 export type TaskDTO = CreateOf<ITask, "name" | "description" | "status">;
@@ -52,6 +53,7 @@ const TaskSchemaDef: SchemaDefinition = {
       changedAt: { type: Date, default: Date.now },
     },
   ],
+  notes: [{ type: Types.ObjectId, ref: "Note" }],
 };
 
 const TaskSchema: Schema = new Schema<ITask>(TaskSchemaDef, {

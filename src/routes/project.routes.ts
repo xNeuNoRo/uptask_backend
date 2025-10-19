@@ -24,6 +24,9 @@ import {
 import { TeamMemberController } from "@/controllers/Team.controller";
 import { hasTeamAuthorization } from "@/middlewares/team.middleware";
 import { hasProjectAuthorization } from "@/middlewares/project.middleware";
+import { NoteController } from "@/controllers/Note.controller";
+import { noteIdValidator, noteValidator } from "@/validators/note.validator";
+import Note from "@/models/Note.model";
 
 const router: Router = Router();
 
@@ -152,6 +155,36 @@ router.delete(
   userIdValidator,
   validateRequest,
   TeamMemberController.removeUserById,
+);
+
+/* Routes for notes */
+
+// Create a note for a specific task within a project
+router.post(
+  "/:projectId/tasks/:taskId/notes",
+  noteValidator,
+  validateRequest,
+  NoteController.createNote,
+);
+
+// Get all notes for a specific task within a project
+router.get("/:projectId/tasks/:taskId/notes", NoteController.getTaskNotes);
+
+// Edit a specific note by ID within a specific task and project
+router.post(
+  "/:projectId/tasks/:taskId/notes/:noteId",
+  noteIdValidator,
+  noteValidator,
+  validateRequest,
+  NoteController.editNote,
+);
+
+// Delete a specific note by ID within a specific task and project
+router.delete(
+  "/:projectId/tasks/:taskId/notes/:noteId",
+  noteIdValidator,
+  validateRequest,
+  NoteController.deleteNote,
 );
 
 export default router;
