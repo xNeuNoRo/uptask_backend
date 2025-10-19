@@ -171,7 +171,7 @@ router.post(
 router.get("/:projectId/tasks/:taskId/notes", NoteController.getTaskNotes);
 
 // Edit a specific note by ID within a specific task and project
-router.post(
+router.put(
   "/:projectId/tasks/:taskId/notes/:noteId",
   noteIdValidator,
   noteValidator,

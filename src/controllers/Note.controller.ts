@@ -102,7 +102,10 @@ export class NoteController {
     try {
       const { noteId } = req.params;
       const { content } = req.body;
-      const note = await Note.findById(noteId);
+      const note = await Note.findById(noteId).populate({
+        path: "createdBy",
+        select: "_id name email",
+      });
 
       if (
         !note ||
