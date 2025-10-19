@@ -3,7 +3,6 @@ import type { Request, Response } from "express";
 import { log, loggerFor, loggerForContext } from "@/lib/loggers";
 import Task, { type TaskDTO } from "@/models/Task.model";
 import { AppError } from "@/utils";
-import { use } from "react";
 
 const logger = loggerForContext(loggerFor("tasks"), {
   component: "controller",
