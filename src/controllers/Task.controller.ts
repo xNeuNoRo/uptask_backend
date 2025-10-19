@@ -3,6 +3,7 @@ import type { Request, Response } from "express";
 import { log, loggerFor, loggerForContext } from "@/lib/loggers";
 import Task, { type TaskDTO } from "@/models/Task.model";
 import { AppError } from "@/utils";
+import { use } from "react";
 
 const logger = loggerForContext(loggerFor("tasks"), {
   component: "controller",
@@ -81,7 +82,11 @@ export class TaskController {
   static getTaskById = async (req: Request, res: Response) => {
     const start = Date.now();
     try {
-      res.success(req.task);
+      const task = await Task.findById(req.task.id).populate({
+        path: "changes.user",
+        select: "_id name email",
+      });
+      res.success(task);
       log(logger, "info", `Fetched task with ID: ${req.task.id.toString()}`, {
         entityId: req.task.id.toString(),
         operation: "read",
@@ -178,7 +183,17 @@ export class TaskController {
   ) => {
     const start = Date.now();
     try {
-      req.task.status = req.body.status;
+      const { status } = req.body;
+      req.task.status = status;
+
+      const data = {
+        user: req.user?.id,
+        status,
+        changedAt: new Date(),
+      };
+      req.task.changes.push(data);
+      if (req.task.changes.length > 50) req.task.changes.shift();
+
       await req.task.save();
       res.success(req.task);
       log(

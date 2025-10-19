@@ -23,6 +23,11 @@ export interface ITask extends Document {
   description: string;
   project: Types.ObjectId;
   status: TaskStatusType;
+  changes: {
+    user: Types.ObjectId | null;
+    status: TaskStatusType;
+    changedAt: Date;
+  }[];
 }
 
 export type TaskDTO = CreateOf<ITask, "name" | "description" | "status">;
@@ -36,6 +41,17 @@ const TaskSchemaDef: SchemaDefinition = {
     enum: Object.values(taskStatus),
     default: taskStatus.PENDING,
   },
+  changes: [
+    {
+      user: { type: Types.ObjectId, ref: "User", default: null },
+      status: {
+        type: String,
+        enum: Object.values(taskStatus),
+        default: taskStatus.PENDING,
+      },
+      changedAt: { type: Date, default: Date.now },
+    },
+  ],
 };
 
 const TaskSchema: Schema = new Schema<ITask>(TaskSchemaDef, {
