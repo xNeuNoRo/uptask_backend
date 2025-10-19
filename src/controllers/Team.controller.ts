@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import User from "@/models/User.model";
+import User, { UserDTO } from "@/models/User.model";
 import { AppError } from "@/utils";
 
 export class TeamMemberController {
@@ -13,7 +13,7 @@ export class TeamMemberController {
   }
 
   static async findMemberByEmail(
-    req: Request<{}, {}, { email: string }>,
+    req: Request<{}, {}, Pick<UserDTO, "email">>,
     res: Response,
   ) {
     const { email } = req.body;

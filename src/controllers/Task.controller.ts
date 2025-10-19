@@ -12,7 +12,7 @@ const logger = loggerForContext(loggerFor("tasks"), {
 
 export class TaskController {
   static createTask = async (
-    req: Request<object, object, Pick<TaskDTO, "name" | "description">>,
+    req: Request<{}, {}, Pick<TaskDTO, "name" | "description">>,
     res: Response,
   ) => {
     const start = Date.now();
@@ -117,7 +117,7 @@ export class TaskController {
   };
 
   static updateTask = async (
-    req: Request<{}, object, Pick<TaskDTO, "name" | "description">>,
+    req: Request<{}, {}, Pick<TaskDTO, "name" | "description">>,
     res: Response,
   ) => {
     const start = Date.now();
@@ -183,7 +183,7 @@ export class TaskController {
   };
 
   static updateTaskStatus = async (
-    req: Request<{}, object, { status: TaskDTO["status"] }>,
+    req: Request<{}, {}, Pick<TaskDTO, "status">>,
     res: Response,
   ) => {
     const start = Date.now();

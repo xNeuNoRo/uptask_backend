@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import { log, loggerFor, loggerForContext } from "@/lib/loggers";
 import { AppError, AuthUtils, JwtUtils } from "@/utils";
-import User from "@/models/User.model";
-import Token from "@/models/Token.model";
+import User, { UserDTO } from "@/models/User.model";
+import Token, { TokenDTO } from "@/models/Token.model";
 import { sendVerificationEmail } from "@/emails/builders/Verification.builder";
 import { sendChangePassEmail } from "@/emails/builders/ChangePass.builder";
 
@@ -13,7 +13,7 @@ let logger = loggerForContext(loggerFor("auth"), {
 
 export class AuthController {
   static createAccount = async (
-    req: Request<{}, {}, { email: string; password: string }>,
+    req: Request<{}, {}, Pick<UserDTO, "email" | "password">>,
     res: Response,
   ) => {
     const start = Date.now();
@@ -62,7 +62,7 @@ export class AuthController {
   };
 
   static requestConfirmationCode = async (
-    req: Request<{}, {}, { email: string }>,
+    req: Request<{}, {}, Pick<UserDTO, "email">>,
     res: Response,
   ) => {
     const start = Date.now();
@@ -115,7 +115,7 @@ export class AuthController {
   };
 
   static forgotPassword = async (
-    req: Request<{}, {}, { email: string }>,
+    req: Request<{}, {}, Pick<UserDTO, "email">>,
     res: Response,
   ) => {
     const start = Date.now();
@@ -169,7 +169,7 @@ export class AuthController {
   };
 
   static confirmAccount = async (
-    req: Request<{}, {}, { token: string }>,
+    req: Request<{}, {}, Pick<TokenDTO, "token">>,
     res: Response,
   ) => {
     const start = Date.now();
@@ -207,7 +207,7 @@ export class AuthController {
   };
 
   static validateToken = async (
-    req: Request<{}, {}, { token: string }>,
+    req: Request<{}, {}, Pick<TokenDTO, "token">>,
     res: Response,
   ) => {
     const start = Date.now();
@@ -243,7 +243,7 @@ export class AuthController {
   };
 
   static updatePasswordWithToken = async (
-    req: Request<{ token: string }, {}, { password: string }>,
+    req: Request<Pick<TokenDTO, "token">, {}, Pick<UserDTO, "password">>,
     res: Response,
   ) => {
     const start = Date.now();
@@ -289,7 +289,7 @@ export class AuthController {
     req: Request<
       {},
       {},
-      { email: string; password: string; remember: boolean }
+      Pick<UserDTO, "email" | "password"> & { remember: boolean }
     >,
     res: Response,
   ) => {

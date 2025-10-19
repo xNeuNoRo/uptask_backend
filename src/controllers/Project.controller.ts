@@ -11,7 +11,14 @@ let logger = loggerForContext(loggerFor("infra"), {
 });
 
 export class ProjectController {
-  static createProject = async (req: Request, res: Response) => {
+  static createProject = async (
+    req: Request<
+      {},
+      {},
+      Pick<ProjectDTO, "projectName" | "clientName" | "description">
+    >,
+    res: Response,
+  ) => {
     const start = Date.now();
     const project = new Project(req.body);
     project.manager = req.user!.id;
@@ -123,7 +130,7 @@ export class ProjectController {
   };
 
   static updateProject = async (
-    req: Request<{}, object, ProjectDTO>,
+    req: Request<{}, {}, ProjectDTO>,
     res: Response,
   ) => {
     const start = Date.now();
