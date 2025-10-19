@@ -45,3 +45,14 @@ export async function projectExists(
     throw new AppError("DB_CONSULT_ERROR");
   }
 }
+
+// Separate middleware to escalate to escalate the function if needed in the future
+export async function hasProjectAuthorization(
+  req: Request,
+  _res: Response,
+  next: NextFunction,
+) {
+  if (req.user?.id.toString() !== req.project.manager!.toString())
+    throw new AppError("UNAUTHORIZED_ACTION");
+  next();
+}

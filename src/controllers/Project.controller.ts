@@ -49,7 +49,10 @@ export class ProjectController {
     try {
       const projects = await Project.find({
         // $or operator to include projects where the user is a collaborator too
-        $or: [{ manager: { $in: req.user!.id } }],
+        $or: [
+          { manager: { $in: req.user!.id } },
+          { team: { $in: req.user!.id } },
+        ],
       });
       res.success(projects);
       log(logger, "info", `Fetched all projects`, {
@@ -81,7 +84,10 @@ export class ProjectController {
     try {
       // Ensure the user is the manager of the project
       // or return 404 to avoid leaking project existence
-      if (req.project.manager!.toString() !== req.user!.id.toString())
+      if (
+        req.project.manager!.toString() !== req.user!.id.toString() &&
+        !req.project.team!.includes(req.user!.id)
+      )
         throw new AppError("PROJECT_NOT_FOUND");
 
       res.success(req.project);

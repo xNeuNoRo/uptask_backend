@@ -27,4 +27,5 @@ export const ERRORS = {
   INVALID_TOKEN: { http: 401, msg: "Token inválido o expirado" },
   INVALID_CREDENTIALS: { http: 401, msg: "Credenciales inválidas" },
   UNATHORIZED: { http: 401, msg: "No autorizado" },
+  UNAUTHORIZED_ACTION: { http: 403, msg: "Acción no autorizada" },
 } as const;

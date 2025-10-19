@@ -55,3 +55,14 @@ export async function taskBelongsToProject(
     throw new AppError("TASK_NOT_FOUND");
   next();
 }
+
+// Separate middleware to escalate to escalate the function if needed in the future
+export async function hasTaskAuthorization(
+  req: Request,
+  _res: Response,
+  next: NextFunction,
+) {
+  if (req.user?.id.toString() !== req.project.manager!.toString())
+    throw new AppError("UNAUTHORIZED_ACTION");
+  next();
+}

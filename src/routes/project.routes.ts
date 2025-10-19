@@ -11,7 +11,10 @@ import {
   taskStatusValidator,
   taskValidator,
 } from "@/validators/project.validator";
-import { taskBelongsToProject } from "@/middlewares/task.middleware";
+import {
+  hasTaskAuthorization,
+  taskBelongsToProject,
+} from "@/middlewares/task.middleware";
 import { authenticateUser } from "@/middlewares/auth.middleware";
 import {
   emailValidator,
@@ -19,6 +22,8 @@ import {
   userIdValidator,
 } from "@/validators/team.validator";
 import { TeamMemberController } from "@/controllers/Team.controller";
+import { hasTeamAuthorization } from "@/middlewares/team.middleware";
+import { hasProjectAuthorization } from "@/middlewares/project.middleware";
 
 const router: Router = Router();
 
@@ -50,19 +55,25 @@ router.get("/:projectId", ProjectController.getProjectById);
 // Update a project
 router.put(
   "/:projectId",
+  hasProjectAuthorization,
   projectValidator,
   validateRequest,
   ProjectController.updateProject,
 );
 
 // Delete a project
-router.delete("/:projectId", ProjectController.deleteProject);
+router.delete(
+  "/:projectId",
+  hasProjectAuthorization,
+  ProjectController.deleteProject,
+);
 
 /** Routes for tasks **/
 
 // Create a new task within a specific project
 router.post(
   "/:projectId/tasks",
+  hasTaskAuthorization,
   taskValidator,
   validateRequest,
   TaskController.createTask,
@@ -87,6 +98,7 @@ router.get(
 // Update a specific task by ID within a specific project
 router.put(
   "/:projectId/tasks/:taskId",
+  hasTaskAuthorization,
   taskIdValidator,
   taskValidator,
   validateRequest,
@@ -96,6 +108,7 @@ router.put(
 // Delete a specific task by ID within a specific project
 router.delete(
   "/:projectId/tasks/:taskId",
+  hasTaskAuthorization,
   taskIdValidator,
   validateRequest,
   TaskController.deleteTask,
@@ -111,8 +124,11 @@ router.post(
 );
 
 /* Routes for teams */
+
+// Get all team members of a project
 router.get("/:projectId/team", TeamMemberController.getProjectTeam);
 
+// Find a team member by email
 router.post(
   "/:projectId/team/find",
   emailValidator,
@@ -120,15 +136,19 @@ router.post(
   TeamMemberController.findMemberByEmail,
 );
 
+// Add a user to the project team by user ID
 router.post(
   "/:projectId/team",
+  hasTeamAuthorization,
   idValidator,
   validateRequest,
   TeamMemberController.addUserById,
 );
 
+// Remove a user from the project team by user ID
 router.delete(
   "/:projectId/team/:userId",
+  hasTeamAuthorization,
   userIdValidator,
   validateRequest,
   TeamMemberController.removeUserById,
