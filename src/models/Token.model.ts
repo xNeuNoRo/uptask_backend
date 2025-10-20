@@ -12,6 +12,7 @@ import { IUser } from "./User.model";
 
 export const tokenType = {
   VERIFY_EMAIL: "verifyEmail",
+  CHANGE_EMAIL: "changeEmail",
   RESET_PASSWORD: "resetPassword",
   TWO_FACTOR_AUTH: "twoFactorAuth",
   MAGIC_LINK: "magicLink",

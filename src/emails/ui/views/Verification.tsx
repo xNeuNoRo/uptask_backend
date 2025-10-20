@@ -8,8 +8,8 @@ import {
   Text,
   Button,
 } from "@react-email/components";
-import Layout from "../layouts/Layout";
-import { APP_NAME } from "../../core/env.config";
+import Layout from "@/emails/ui/layouts/Layout";
+import { APP_NAME } from "@/emails/core/envconfig";
 
 type VerificationProps = {
   verificationLink: string;

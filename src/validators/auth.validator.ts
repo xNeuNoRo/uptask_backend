@@ -28,7 +28,7 @@ export const tokenValidator = [
   body("token").notEmpty().withMessage("El token es obligatorio"),
 ];
 
-export const changePassValidator = [
+export const changePassTokenValidator = [
   param("token").isNumeric().withMessage("Token no válido"),
   ...passwordValidator,
 ];
@@ -37,4 +37,16 @@ export const loginValidator = [
   body("email").isEmail().withMessage("El email no es válido"),
   body("password").notEmpty().withMessage("El password es obligatorio"),
   body("remember").isBoolean().withMessage("El campo 'remember' no es válido"),
+];
+
+export const profileValidator = [
+  body("name").notEmpty().withMessage("El nombre es obligatorio"),
+  body("email").isEmail().withMessage("El email no es válido"),
+];
+
+export const changePasswordValidator = [
+  body("currentPassword")
+    .notEmpty()
+    .withMessage("El password actual es obligatorio"),
+  ...passwordValidator,
 ];

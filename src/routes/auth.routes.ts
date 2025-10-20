@@ -7,7 +7,9 @@ import {
   emailValidator,
   tokenValidator,
   passwordValidator,
-  changePassValidator,
+  changePassTokenValidator,
+  profileValidator,
+  changePasswordValidator,
 } from "@/validators/auth.validator";
 import { Router } from "express";
 
@@ -56,7 +58,7 @@ router.post(
 // Update password using reset token
 router.post(
   "/update-password/:token",
-  changePassValidator,
+  changePassTokenValidator,
   validateRequest,
   AuthController.updatePasswordWithToken,
 );
@@ -68,9 +70,33 @@ router.post("/login", loginValidator, validateRequest, AuthController.login);
 router.post("/refresh", AuthController.refreshToken);
 
 // Logout from the application
-router.post("/logout", authenticateUser, AuthController.logout);
+router.post("/logout", AuthController.logout);
 
 // Get authenticated user info
 router.get("/user", authenticateUser, AuthController.getUser);
+
+router.put(
+  "/profile",
+  authenticateUser,
+  profileValidator,
+  validateRequest,
+  AuthController.updateProfile,
+);
+
+router.post(
+  "/update-email/:token",
+  authenticateUser,
+  emailValidator,
+  validateRequest,
+  AuthController.updateEmail,
+);
+
+router.post(
+  "/update-password",
+  authenticateUser,
+  changePasswordValidator,
+  validateRequest,
+  AuthController.updateCurrentUserPassword,
+);
 
 export default router;

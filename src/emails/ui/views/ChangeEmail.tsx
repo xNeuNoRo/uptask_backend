@@ -13,21 +13,16 @@ import { APP_NAME } from "@/emails/core/envconfig";
 
 type ChangePassProps = {
   name?: string;
-  changePassLink: string;
   sixDigitCode: string;
 };
 
-export default function ChangePass({
-  name,
-  changePassLink,
-  sixDigitCode,
-}: ChangePassProps) {
+export default function ChangeEmail({ name, sixDigitCode }: ChangePassProps) {
   return (
     <Html lang="es">
       <Head />
       <Preview>
-        Haz clic en el boton para actualizar tu contraseña. Si no pediste el
-        cambio, ignora este correo.
+        Haz clic en el boton para actualizar tu email. Si no pediste el cambio,
+        ignora este correo.
       </Preview>
       <Tailwind>
         <Body>
@@ -37,9 +32,9 @@ export default function ChangePass({
                 Hola{name && ` ${name}`},
               </Text>
               <Text className="mb-4">
-                Recibimos una solicitud para cambiar la contraseña de tu cuenta
-                en <b>{APP_NAME}</b>. Si fuiste tú, copia el siguiente código
-                para actualizar tu contraseña:
+                Recibimos una solicitud para cambiar el correo de tu cuenta en{" "}
+                <b>{APP_NAME}</b>. Si fuiste tú, copia el siguiente código para
+                actualizar tu correo:
               </Text>
 
               <Section className="text-center">
@@ -48,20 +43,10 @@ export default function ChangePass({
                 </Text>
               </Section>
 
-              <Text className="my-2 text-sm">
-                Luego, haz click en el botón debajo y digita este código en la
-                página de cambio de contraseña:
+              <Text className="my-2 mb-8 text-sm">
+                Luego, ingresa el código en la página para cambiar tu correo.
                 <br />
               </Text>
-
-              <Section className="my-8 text-center">
-                <Button
-                  href={changePassLink}
-                  className="px-4 py-2 font-medium text-white bg-purple-600 rounded-lg"
-                >
-                  Cambiar contraseña
-                </Button>
-              </Section>
 
               <Text className="mt-2 text-sm text-gray-600">
                 Si no solicitaste este cambio, ignora este correo.

@@ -1,7 +1,7 @@
-import { Section, Container } from "@react-email/components";
 import { ReactNode } from "react";
-import Header from "../components/Header";
-import Footer from "../components/Footer";
+import { Section, Container } from "@react-email/components";
+import Header from "@/emails/ui/components/Header";
+import Footer from "@/emails/ui/components/Footer";
 
 type LayoutProps = {
   children: ReactNode;

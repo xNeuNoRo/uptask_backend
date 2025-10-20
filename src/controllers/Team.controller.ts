@@ -9,7 +9,7 @@ const logger = loggerForContext(loggerFor("team"), {
 });
 
 export class TeamMemberController {
-  static async getProjectTeam(req: Request, res: Response) {
+  static getProjectTeam = async (req: Request, res: Response) => {
     const start = Date.now();
     try {
       await req.project.populate({ path: "team", select: "id name email" });
@@ -42,12 +42,12 @@ export class TeamMemberController {
       );
       throw new AppError("DB_CONSULT_ERROR");
     }
-  }
+  };
 
-  static async findMemberByEmail(
+  static findMemberByEmail = async (
     req: Request<{}, {}, Pick<UserDTO, "email">>,
     res: Response,
-  ) {
+  ) => {
     const start = Date.now();
     const { email } = req.body;
 
@@ -83,12 +83,12 @@ export class TeamMemberController {
       );
       throw new AppError("DB_CONSULT_ERROR");
     }
-  }
+  };
 
-  static async addUserById(
+  static addUserById = async (
     req: Request<{}, {}, { id: string }>,
     res: Response,
-  ) {
+  ) => {
     const start = Date.now();
     const { id } = req.body;
 
@@ -134,9 +134,12 @@ export class TeamMemberController {
       );
       throw new AppError("DB_CONSULT_ERROR");
     }
-  }
+  };
 
-  static async removeUserById(req: Request<{ userId: string }>, res: Response) {
+  static removeUserById = async (
+    req: Request<{ userId: string }>,
+    res: Response,
+  ) => {
     const start = Date.now();
     const { userId } = req.params;
 
@@ -179,5 +182,5 @@ export class TeamMemberController {
       );
       throw new AppError("DB_CONSULT_ERROR");
     }
-  }
+  };
 }

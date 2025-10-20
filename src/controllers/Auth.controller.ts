@@ -5,6 +5,7 @@ import User, { UserDTO } from "@/models/User.model";
 import Token, { TokenDTO } from "@/models/Token.model";
 import { sendVerificationEmail } from "@/emails/builders/Verification.builder";
 import { sendChangePassEmail } from "@/emails/builders/ChangePass.builder";
+import { sendChangeEmailCodeEmail } from "@/emails/builders/ChangeEmail.builder";
 
 let logger = loggerForContext(loggerFor("auth"), {
   entityType: "user",
@@ -54,7 +55,12 @@ export class AuthController {
         logger,
         "error",
         "Error creating user account",
-        { operation: "create", status: "fail", errorCode: "DB_CONSULT_ERROR" },
+        {
+          operation: "create",
+          status: "fail",
+          errorCode: "DB_CONSULT_ERROR",
+          durationMs: Date.now() - start,
+        },
         { err },
       );
       throw new AppError("DB_CONSULT_ERROR");
@@ -107,7 +113,12 @@ export class AuthController {
         logger,
         "error",
         "Error sending verification code",
-        { operation: "create", status: "fail", errorCode: "DB_CONSULT_ERROR" },
+        {
+          operation: "create",
+          status: "fail",
+          errorCode: "DB_CONSULT_ERROR",
+          durationMs: Date.now() - start,
+        },
         { err },
       );
       throw new AppError("DB_CONSULT_ERROR");
@@ -161,7 +172,12 @@ export class AuthController {
         logger,
         "error",
         "Error sending change password instructions",
-        { operation: "send", status: "fail", errorCode: "DB_CONSULT_ERROR" },
+        {
+          operation: "send",
+          status: "fail",
+          errorCode: "DB_CONSULT_ERROR",
+          durationMs: Date.now() - start,
+        },
         { err },
       );
       throw new AppError("DB_CONSULT_ERROR");
@@ -199,7 +215,12 @@ export class AuthController {
         logger,
         "error",
         "Error confirming account",
-        { operation: "update", status: "fail", errorCode: "DB_CONSULT_ERROR" },
+        {
+          operation: "update",
+          status: "fail",
+          errorCode: "DB_CONSULT_ERROR",
+          durationMs: Date.now() - start,
+        },
         { err },
       );
       throw new AppError("DB_CONSULT_ERROR");
@@ -235,6 +256,7 @@ export class AuthController {
           operation: "read",
           status: "fail",
           errorCode: "DB_CONSULT_ERROR",
+          durationMs: Date.now() - start,
         },
         { err },
       );
@@ -278,6 +300,7 @@ export class AuthController {
           operation: "update",
           status: "fail",
           errorCode: "DB_CONSULT_ERROR",
+          durationMs: Date.now() - start,
         },
         { err },
       );
@@ -358,6 +381,7 @@ export class AuthController {
           operation: "read",
           status: "fail",
           errorCode: "DB_CONSULT_ERROR",
+          durationMs: Date.now() - start,
         },
         { err },
       );
@@ -366,6 +390,7 @@ export class AuthController {
   };
 
   static refreshToken = async (req: Request, res: Response) => {
+    const start = Date.now();
     try {
       const token = req.cookies?.refresh_token;
       if (!token) throw new AppError("TOKEN_NOT_PROVIDED");
@@ -404,7 +429,12 @@ export class AuthController {
         logger,
         "error",
         "Error refreshing access token",
-        { operation: "read", status: "fail", errorCode: "DB_CONSULT_ERROR" },
+        {
+          operation: "read",
+          status: "fail",
+          errorCode: "DB_CONSULT_ERROR",
+          durationMs: Date.now() - start,
+        },
         { err },
       );
       throw new AppError("DB_CONSULT_ERROR");
@@ -428,5 +458,178 @@ export class AuthController {
       status: "success",
     });
     res.success({ user: req.user }, 200);
+  };
+
+  static updateProfile = async (
+    req: Request<{}, {}, Pick<UserDTO, "name" | "email">>,
+    res: Response,
+  ) => {
+    const start = Date.now();
+    try {
+      const { name, email } = req.body;
+
+      const userExists = await User.findOne({ email });
+      if (userExists && userExists.id !== req.user!.id)
+        throw new AppError("USER_ALREADY_EXISTS");
+
+      req.user!.name = name;
+      await req.user!.save();
+
+      log(logger, "info", "Updated user profile with ID: " + req.user?.id, {
+        entityId: req.user?.id.toString(),
+        operation: "update",
+        status: "success",
+        durationMs: Date.now() - start,
+      });
+
+      res.success({ user: req.user }, 200);
+
+      // Only send change email code if the email has changed
+      if (email !== req.user!.email) {
+        // Delete all changeEmail tokens for this user
+        await Token.deleteMany({
+          user: req.user?.id,
+          type: "changeEmail",
+        });
+
+        const sixDigitCode = AuthUtils.generate6DigitToken();
+        const token = new Token({
+          token: sixDigitCode,
+          type: "changeEmail",
+          user: req.user?.id,
+          expiresAt: Date.now() + 1800000, // 30 minutes
+        });
+        await token.save();
+
+        sendChangeEmailCodeEmail({
+          to: email,
+          name: req.user!.name,
+          sixDigitCode,
+        });
+
+        log(
+          logger,
+          "info",
+          `Sent change email code to ${email} for user ID: ${req.user?.id}`,
+          {
+            entityId: req.user?.id.toString(),
+            operation: "send",
+            status: "success",
+            durationMs: Date.now() - start,
+          },
+        );
+      }
+    } catch (err) {
+      if (err instanceof AppError) throw err;
+      log(
+        logger,
+        "error",
+        `Error updating user profile with ID: ${req.user?.id}`,
+        {
+          operation: "update",
+          status: "fail",
+          errorCode: "DB_CONSULT_ERROR",
+          durationMs: Date.now() - start,
+        },
+        { err },
+      );
+      throw new AppError("DB_CONSULT_ERROR");
+    }
+  };
+
+  static updateEmail = async (
+    req: Request<Pick<TokenDTO, "token">, {}, Pick<UserDTO, "email">>,
+    res: Response,
+  ) => {
+    const start = Date.now();
+    try {
+      const { token } = req.params;
+      const { email } = req.body;
+
+      const tokenExists = await Token.findOne({
+        token,
+      });
+      if (!tokenExists) throw new AppError("INVALID_TOKEN");
+
+      req.user!.email = email;
+      await Promise.allSettled([req.user!.save(), tokenExists.deleteOne()]);
+
+      log(logger, "info", "Updated user email with ID: " + req.user?.id, {
+        entityId: req.user?.id.toString(),
+        operation: "update",
+        status: "success",
+        durationMs: Date.now() - start,
+      });
+
+      res.success({ user: req.user }, 200);
+    } catch (err) {
+      if (err instanceof AppError) throw err;
+      log(
+        logger,
+        "error",
+        `Error updating user email with ID: ${req.user?.id}`,
+        {
+          operation: "update",
+          status: "fail",
+          errorCode: "DB_CONSULT_ERROR",
+          durationMs: Date.now() - start,
+        },
+        { err },
+      );
+      throw new AppError("DB_CONSULT_ERROR");
+    }
+  };
+
+  static updateCurrentUserPassword = async (
+    req: Request<
+      {},
+      {},
+      {
+        currentPassword: UserDTO["password"];
+        password: UserDTO["password"];
+      }
+    >,
+    res: Response,
+  ) => {
+    const start = Date.now();
+    try {
+      const { currentPassword, password } = req.body;
+
+      const user = await User.findById(req.user!.id);
+      if (!user) throw new AppError("USER_NOT_FOUND");
+
+      const isValidPassword = await AuthUtils.verifyPassword(
+        user.password,
+        currentPassword,
+      );
+      if (!isValidPassword) throw new AppError("INVALID_CURRENT_PASSWORD");
+
+      user.password = await AuthUtils.hashPassword(password);
+      await user.save();
+
+      log(logger, "info", `Updated password for user ID: ${req.user?.id}`, {
+        entityId: req.user!.id.toString(),
+        operation: "update",
+        status: "success",
+        durationMs: Date.now() - start,
+      });
+
+      res.success(null, 200);
+    } catch (err) {
+      if (err instanceof AppError) throw err;
+      log(
+        logger,
+        "error",
+        `Error updating password for user ID: ${req.user?.id}`,
+        {
+          operation: "update",
+          status: "fail",
+          errorCode: "DB_CONSULT_ERROR",
+          durationMs: Date.now() - start,
+        },
+        { err },
+      );
+      throw new AppError("DB_CONSULT_ERROR");
+    }
   };
 }

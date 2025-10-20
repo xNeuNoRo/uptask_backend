@@ -1,6 +1,6 @@
 import { render } from "@react-email/render";
 import { ChangePass } from "@/emails/ui/views";
-import { APP_NAME } from "@/emails/core/env.config";
+import { APP_NAME } from "@/emails/core/envconfig";
 import { MailUtils } from "@/emails/core/mail";
 
 export async function sendChangePassEmail(params: {
@@ -21,6 +21,6 @@ export async function sendChangePassEmail(params: {
     subject: `[${APP_NAME}] Cambio de contraseña`,
     html: view,
     // Text seria el fallback en caso de que el html no cargue
-    text: `Recibimos una solicitud para cambiar la contraseña de tu cuenta en ${APP_NAME}.\nSi fuiste tú, abre este enlace para actualizarla: ${params.changePassLink}\nSi el enlace no abre, copia y pégalo en tu navegador.\nSi no solicitaste este cambio, ignora este correo. Por seguridad, este enlace expirará en 30 minutos.`,
+    text: `Recibimos una solicitud para cambiar la contraseña de tu cuenta en ${APP_NAME}.\nSi fuiste tú,\nCopia este codigo ${params.sixDigitCode} y abre este enlace para actualizarla: ${params.changePassLink}\nSi el enlace no abre, copia y pégalo en tu navegador.\nSi no solicitaste este cambio, ignora este correo. Por seguridad, este codigo expirará en 30 minutos.`,
   });
 }

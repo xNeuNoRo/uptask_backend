@@ -1,6 +1,5 @@
-import { Section, Text, Link, Img } from "@react-email/components";
-import { APP_NAME, APP_DOMAIN } from "@/emails/core/env.config";
-import { asset } from "@/utils/asset";
+import { Section, Text } from "@react-email/components";
+import { APP_NAME, APP_DOMAIN } from "@/emails/core/envconfig";
 
 export default function Header() {
   return (
