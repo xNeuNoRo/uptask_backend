@@ -91,7 +91,7 @@ router.post(
   AuthController.updateEmail,
 );
 
-router.post(
+router.put(
   "/update-password",
   authenticateUser,
   changePasswordValidator,

@@ -27,7 +27,7 @@ export const ERRORS = {
   NOTE_NOT_FOUND: { http: 404, msg: "Nota no encontrada" },
   INVALID_TOKEN: { http: 401, msg: "Token inválido o expirado" },
   INVALID_CREDENTIALS: { http: 401, msg: "Credenciales inválidas" },
-  INVALID_CURRENT_PASSWORD: { http: 401, msg: "Contraseña actual no válido" },
+  INVALID_CURRENT_PASSWORD: { http: 401, msg: "Contraseña actual no válida" },
   UNATHORIZED: { http: 401, msg: "No autorizado" },
   UNAUTHORIZED_ACTION: { http: 403, msg: "Acción no autorizada" },
 } as const;
