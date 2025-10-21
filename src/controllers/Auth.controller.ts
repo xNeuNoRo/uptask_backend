@@ -632,4 +632,46 @@ export class AuthController {
       throw new AppError("DB_CONSULT_ERROR");
     }
   };
+
+  static checkPassword = async (
+    req: Request<{}, {}, Pick<UserDTO, "password">>,
+    res: Response,
+  ) => {
+    const start = Date.now();
+    try {
+      const { password } = req.body;
+      const user = await User.findById(req.user!.id);
+      if (!user) throw new AppError("USER_NOT_FOUND");
+
+      const isValidPassword = await AuthUtils.verifyPassword(
+        user.password,
+        password,
+      );
+      if (!isValidPassword) throw new AppError("INVALID_PASSWORD");
+
+      log(logger, "info", `Checked password for user ID: ${req.user?.id}`, {
+        entityId: req.user!.id.toString(),
+        operation: "read",
+        status: "success",
+        durationMs: Date.now() - start,
+      });
+
+      res.success(null, 200);
+    } catch (err) {
+      if (err instanceof AppError) throw err;
+      log(
+        logger,
+        "error",
+        `Error checking password for user ID: ${req.user?.id}`,
+        {
+          operation: "read",
+          status: "fail",
+          errorCode: "DB_CONSULT_ERROR",
+          durationMs: Date.now() - start,
+        },
+        { err },
+      );
+      throw new AppError("DB_CONSULT_ERROR");
+    }
+  };
 }

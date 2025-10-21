@@ -6,10 +6,10 @@ import {
   registerValidator,
   emailValidator,
   tokenValidator,
-  passwordValidator,
   changePassTokenValidator,
   profileValidator,
   changePasswordValidator,
+  checkPasswordValidator,
 } from "@/validators/auth.validator";
 import { Router } from "express";
 
@@ -75,6 +75,7 @@ router.post("/logout", AuthController.logout);
 // Get authenticated user info
 router.get("/user", authenticateUser, AuthController.getUser);
 
+// Update user profile
 router.put(
   "/profile",
   authenticateUser,
@@ -83,6 +84,7 @@ router.put(
   AuthController.updateProfile,
 );
 
+// Update user email
 router.post(
   "/update-email/:token",
   authenticateUser,
@@ -91,12 +93,21 @@ router.post(
   AuthController.updateEmail,
 );
 
+// Update user password
 router.put(
   "/update-password",
   authenticateUser,
   changePasswordValidator,
   validateRequest,
   AuthController.updateCurrentUserPassword,
+);
+
+router.post(
+  "/check-password",
+  authenticateUser,
+  checkPasswordValidator,
+  validateRequest,
+  AuthController.checkPassword,
 );
 
 export default router;

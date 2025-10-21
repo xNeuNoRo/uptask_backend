@@ -50,3 +50,7 @@ export const changePasswordValidator = [
     .withMessage("El password actual es obligatorio"),
   ...passwordValidator,
 ];
+
+export const checkPasswordValidator = [
+  body("password").notEmpty().withMessage("El password es obligatorio"),
+];
