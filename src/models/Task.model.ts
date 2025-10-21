@@ -7,6 +7,7 @@ import {
 } from "mongoose";
 
 import type { CreateOf } from "@/types/mongoose-utils";
+import Note from "./Note.model";
 
 export const taskStatus = {
   PENDING: "pending",
@@ -58,6 +59,14 @@ const TaskSchemaDef: SchemaDefinition = {
 
 const TaskSchema: Schema = new Schema<ITask>(TaskSchemaDef, {
   timestamps: true,
+});
+
+// Middleware
+TaskSchema.pre<ITask>("deleteOne", { document: true }, async function () {
+  // Cascade delete notes associated with the task
+  const taskId = this._id;
+  if (!taskId) return;
+  await Note.deleteMany({ task: taskId });
 });
 
 const Task = model<ITask>("Task", TaskSchema);
