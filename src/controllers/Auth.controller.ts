@@ -34,6 +34,12 @@ export class AuthController {
         user: user.id,
         expiresAt: Date.now() + 1800000, // 30 minutes
       });
+      // REFACTOR: Send email first, and if it fails, it throw error and don't save the token & user
+      await sendVerificationEmail({
+        to: user.email,
+        verificationLink: `${process.env.FRONTEND_URL}/auth/confirm`,
+        sixDigitCode,
+      });
       await Promise.allSettled([user.save(), token.save()]);
 
       log(logger, "info", "User created with ID: " + user.id, {
@@ -43,12 +49,6 @@ export class AuthController {
         durationMs: Date.now() - start,
       });
       res.success(null, 201);
-
-      sendVerificationEmail({
-        to: user.email,
-        verificationLink: `${process.env.FRONTEND_URL}/auth/confirm`,
-        sixDigitCode,
-      });
     } catch (err) {
       if (err instanceof AppError) throw err;
       log(
@@ -92,6 +92,12 @@ export class AuthController {
         user: user.id,
         expiresAt: Date.now() + 1800000, // 30 minutes
       });
+      // REFACTOR: Send email first, and if it fails, it throw error and don't save the token
+      await sendVerificationEmail({
+        to: user.email,
+        verificationLink: `${process.env.FRONTEND_URL}/auth/confirm`,
+        sixDigitCode,
+      });
       await token.save();
 
       log(logger, "info", "Verification code sent to user ID: " + user.id, {
@@ -101,12 +107,6 @@ export class AuthController {
         durationMs: Date.now() - start,
       });
       res.success(null, 200);
-
-      sendVerificationEmail({
-        to: user.email,
-        verificationLink: `${process.env.FRONTEND_URL}/auth/confirm`,
-        sixDigitCode,
-      });
     } catch (err) {
       if (err instanceof AppError) throw err;
       log(
@@ -150,6 +150,13 @@ export class AuthController {
         user: user.id,
         expiresAt: Date.now() + 1800000, // 30 minutes
       });
+      // REFACTOR: Send email first, and if it fails, it throw error and don't save the token
+      sendChangePassEmail({
+        to: user.email,
+        name: user.name,
+        changePassLink: `${process.env.FRONTEND_URL}/auth/new-password`,
+        sixDigitCode,
+      });
       await token.save();
 
       log(logger, "info", "Password reset code sent to user ID: " + user.id, {
@@ -159,13 +166,6 @@ export class AuthController {
         durationMs: Date.now() - start,
       });
       res.success(null, 200);
-
-      sendChangePassEmail({
-        to: user.email,
-        name: user.name,
-        changePassLink: `${process.env.FRONTEND_URL}/auth/new-password`,
-        sixDigitCode,
-      });
     } catch (err) {
       if (err instanceof AppError) throw err;
       log(
@@ -337,6 +337,8 @@ export class AuthController {
           expiresAt: Date.now() + 1800000, // 30 minutes
         });
         await token.save();
+        // Here, is not necessary to await the email sending,
+        // since the user already registered so we can assume that the email is valid
         sendVerificationEmail({
           to: user.email,
           verificationLink: `${process.env.FRONTEND_URL}/auth/confirm`,
@@ -482,8 +484,6 @@ export class AuthController {
         durationMs: Date.now() - start,
       });
 
-      res.success({ user: req.user }, 200);
-
       // Only send change email code if the email has changed
       if (email !== req.user!.email) {
         // Delete all changeEmail tokens for this user
@@ -499,13 +499,14 @@ export class AuthController {
           user: req.user?.id,
           expiresAt: Date.now() + 1800000, // 30 minutes
         });
-        await token.save();
 
-        sendChangeEmailCodeEmail({
+        // REFACTOR: Send email first, and if it fails, it throw error and don't save the token
+        await sendChangeEmailCodeEmail({
           to: email,
           name: req.user!.name,
           sixDigitCode,
         });
+        await token.save();
 
         log(
           logger,
@@ -519,6 +520,8 @@ export class AuthController {
           },
         );
       }
+
+      res.success({ user: req.user }, 200);
     } catch (err) {
       if (err instanceof AppError) throw err;
       log(

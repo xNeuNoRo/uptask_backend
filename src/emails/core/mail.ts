@@ -2,8 +2,10 @@ import { mailConfig } from "@/config/mail";
 import nodemailer, { Transporter } from "nodemailer";
 import colors from "colors";
 import SMTPTransport from "nodemailer/lib/smtp-transport";
-import Mail from "nodemailer/lib/mailer";
+import Mail, { Address } from "nodemailer/lib/mailer";
 import { log, loggerFor, loggerForContext } from "@/lib/loggers";
+import dns from "dns/promises";
+import { AppError } from "@/utils";
 
 const logger = loggerForContext(loggerFor("infra"), {
   component: "email",
@@ -34,9 +36,38 @@ export class MailUtils {
     return 1;
   }
 
+  static parseEmails(to: string | Address | Array<string | Address>): string[] {
+    // Si es un array
+    if (Array.isArray(to)) {
+      // Si es un string retornamos dicho string o el address
+      return to.map((t) => (typeof t === "string" ? t : t.address));
+    }
+    return [typeof to === "string" ? to : to.address];
+  }
+
+  static async verifyMXRegistry(
+    to: string | Address | Array<string | Address>,
+  ) {
+    const emails = this.parseEmails(to);
+
+    for (const email of emails) {
+      const emailDomain = email.split("@")[1];
+      try {
+        await dns.resolveMx(emailDomain);
+      } catch (err) {
+        throw new AppError("EMAIL_NOT_VALID");
+      }
+    }
+  }
+
   static async sendMail(opts: Mail.Options) {
     const start = Date.now();
     try {
+      // Verificar registros MX antes de enviar el correo
+      // De esa manera evitamos errores de envío por dominios inválidos
+      await this.verifyMXRegistry(opts.to!);
+      new AppError("EMAIL_NOT_VALID");
+
       const info = await this.transporter.sendMail({
         from: opts.from ?? mailConfig.from,
         ...opts,
@@ -75,6 +106,7 @@ export class MailUtils {
       );
       return info;
     } catch (err) {
+      if (err instanceof AppError) throw err;
       const totalTime = Date.now() - start;
       log(
         logger,
