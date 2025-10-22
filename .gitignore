@@ -1,6 +1,6 @@
 .husky
 .tsbuildinfo
-.env
+.env*
 .VSCodeCounter
 coverage
 dist
