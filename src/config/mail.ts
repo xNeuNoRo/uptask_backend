@@ -4,5 +4,5 @@ export const mailConfig = {
   secure: process.env.SMTP_SECURE === "true",
   user: process.env.SMTP_USER!,
   pass: process.env.SMTP_PASS!,
-  from: `"${process.env.APP_NAME}" <onboarding@resend.dev>`, // Si compro un dominio no-reply@${process.env.APP_DOMAIN}
+  from: `"${process.env.APP_NAME}" <angelgonzalez280304@gmail.com>`, // Si compro un dominio no-reply@${process.env.APP_DOMAIN}
 } as const;
