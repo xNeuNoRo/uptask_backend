@@ -407,17 +407,7 @@ export class AuthController {
         { user_id: user.id, type: "access" },
         "access",
       );
-      const refreshToken = JwtUtils.generateToken(
-        { user_id: user.id, type: decoded.type },
-        decoded.type ?? "refresh_short",
-      );
 
-      AuthUtils.setAuthCookie(
-        req,
-        res,
-        refreshToken,
-        decoded.remember ?? false,
-      );
       log(logger, "info", "Refreshed tokens for user ID: " + user.id, {
         entityId: user.id.toString(),
         operation: "read",
