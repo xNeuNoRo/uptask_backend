@@ -45,18 +45,18 @@ export class AuthUtils {
       secure: true,
       sameSite: "none",
       maxAge: exp,
-      path: req.baseUrl,
+      path: "/",
     };
 
     return res.cookie("refresh_token", refreshToken, options);
   }
 
-  static clearAuthCookie(req: Request, res: Response) {
+  static clearAuthCookie(_req: Request, res: Response) {
     return res.clearCookie("refresh_token", {
       httpOnly: true,
       secure: true,
       sameSite: "none",
-      path: req.baseUrl,
+      path: "/",
     });
   }
 }
