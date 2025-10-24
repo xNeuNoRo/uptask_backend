@@ -9,11 +9,6 @@ export const logger = isProduction
       transport: {
         targets: [
           {
-            target: "pino-pretty",
-            options: { colorize: true },
-            level: "debug",
-          },
-          {
             target: "pino-loki",
             options: {
               host: process.env.GRAFANA_LOKI_URL!,
