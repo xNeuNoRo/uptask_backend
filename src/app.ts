@@ -1,3 +1,4 @@
+import "@/config/tracing";
 import express, { type Express } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
@@ -7,6 +8,7 @@ import { registerRoutes } from "@/routes";
 import { AppError } from "@/utils";
 import { corsConfig } from "./config/cors";
 import path from "node:path";
+import { metrics } from "./middlewares/metrics.middleware";
 
 export function createApp(): Express {
   const app: Express = express();
@@ -46,6 +48,7 @@ export function createApp(): Express {
   app.use(express.json());
   app.use(cookieParser());
   app.use(success);
+  app.use(metrics);
 
   // Register routes
   registerRoutes(app);

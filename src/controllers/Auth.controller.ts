@@ -49,6 +49,9 @@ export class AuthController {
         durationMs: Date.now() - start,
       });
       res.success(null, 201);
+
+      // Increment the signups counter
+      req.metrics.counters.userSignups.inc();
     } catch (err) {
       if (err instanceof AppError) throw err;
       log(

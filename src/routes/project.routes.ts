@@ -3,7 +3,20 @@ import { Router } from "express";
 // Import all controllers
 import { ProjectController } from "@/controllers/Project.controller";
 import { TaskController } from "@/controllers/Task.controller";
-import { validateRequest, projectExists, taskExists } from "@/middlewares";
+import { TeamMemberController } from "@/controllers/Team.controller";
+import { NoteController } from "@/controllers/Note.controller";
+// Import all middlewares
+import {
+  authenticateUser,
+  validateRequest,
+  projectExists,
+  hasProjectAuthorization,
+  taskExists,
+  hasTaskAuthorization,
+  taskBelongsToProject,
+  hasTeamAuthorization,
+} from "@/middlewares";
+// Import all validators
 import {
   projectIdValidator,
   projectValidator,
@@ -12,21 +25,11 @@ import {
   taskValidator,
 } from "@/validators/project.validator";
 import {
-  hasTaskAuthorization,
-  taskBelongsToProject,
-} from "@/middlewares/task.middleware";
-import { authenticateUser } from "@/middlewares/auth.middleware";
-import {
   emailValidator,
   idValidator,
   userIdValidator,
 } from "@/validators/team.validator";
-import { TeamMemberController } from "@/controllers/Team.controller";
-import { hasTeamAuthorization } from "@/middlewares/team.middleware";
-import { hasProjectAuthorization } from "@/middlewares/project.middleware";
-import { NoteController } from "@/controllers/Note.controller";
 import { noteIdValidator, noteValidator } from "@/validators/note.validator";
-import Note from "@/models/Note.model";
 
 const router: Router = Router();
 

@@ -1,3 +1,6 @@
+# Agregar el agente que se encargara de enviar las metricas a Grafana Cloud
+FROM grafana/agent:latest AS agent
+
 # Instalar Node 22 completo para compilar luego
 FROM node:22 AS builder
 
@@ -18,7 +21,7 @@ COPY src ./src
 RUN pnpm run build
 
 # Ahora si instalamos Node mas ligero para ejecucion
-FROM node:22-alpine AS runner
+FROM node:22 AS runner
 
 # Directorio principal
 WORKDIR /app
@@ -33,8 +36,14 @@ RUN pnpm install --frozen-lockfile --prod --config.approve-builds=true
 # Copiamos la app compilada de JS del builder
 COPY --from=builder /app/dist ./dist
 
+# Copiar el agente para enviar metricas
+COPY --from=agent /usr/bin/grafana-agent /usr/local/bin/grafana-agent
+
+# Copiar el archivo de configuracion del agente
+COPY agent.yaml ./agent.yaml
+
 # Puerto del servidor
 EXPOSE 4000
 
 # Comandos de arranque
-CMD ["pnpm", "run", "build:start"]
+CMD ["sh", "-c", "grafana-agent -config.expand-env --config.file=./agent.yaml & pnpm run build:start"]

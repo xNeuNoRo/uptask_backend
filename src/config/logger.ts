@@ -4,7 +4,32 @@ const isProduction = process.env.NODE_ENV === "production";
 const isTesting = process.env.NODE_ENV === "test";
 
 export const logger = isProduction
-  ? pino({ level: "info" })
+  ? pino({
+      level: "debug",
+      transport: {
+        targets: [
+          {
+            target: "pino-pretty",
+            options: { colorize: true },
+            level: "debug",
+          },
+          {
+            target: "pino-loki",
+            options: {
+              host: process.env.GRAFANA_LOKI_URL!,
+              basicAuth: {
+                username: process.env.GRAFANA_LOKI_STACK_ID!,
+                password: process.env.GRAFANA_TOKEN!,
+              },
+              batching: true,
+              interval: 5,
+              labels: { app: "p10-uptask-server" },
+            },
+            level: "info",
+          },
+        ],
+      },
+    })
   : pino({
       level: isTesting ? "silent" : "debug", // Silent during tests
       transport: {
