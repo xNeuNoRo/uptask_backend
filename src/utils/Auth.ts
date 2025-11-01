@@ -41,7 +41,7 @@ export class AuthUtils {
       : Number(process.env.REFRESH_TTL_SHORT) * 1000;
 
     const options: CookieOptions = {
-      httpOnly: true,
+      //httpOnly: true,
       secure: true,
       sameSite: "none",
       maxAge: exp,
@@ -54,7 +54,7 @@ export class AuthUtils {
 
   static clearAuthCookie(_req: Request, res: Response) {
     return res.clearCookie("refresh_token", {
-      httpOnly: true,
+      //httpOnly: true,
       secure: true,
       sameSite: "none",
       path: "/",
