@@ -5,8 +5,10 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
 
 > Proyecto de práctica: Gestor de Tareas (Clon de Trello) completo.
-> Backend en Node.js con Express.
+
 > Aplicación creada con Node.js + TypeScript + Express.
+
+[Repositorio del Frontend](https://github.com/xNeuNoRo/uptask_frontend)
 
 ## Contenido
 
