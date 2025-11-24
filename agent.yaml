@@ -10,8 +10,9 @@ metrics:
       scrape_configs:
         - job_name: "api"
           static_configs:
-            - targets: ["127.0.0.1:4000"]
+            - targets: ["uptask-backend.koyeb.app"]
           metrics_path: /api/v1/metrics
+          scheme: https
       remote_write:
         - url: ${GRAFANA_PROMETHEUS_URL}
           basic_auth:
