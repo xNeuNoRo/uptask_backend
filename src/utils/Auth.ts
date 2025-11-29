@@ -1,7 +1,8 @@
-import crypto from "crypto";
 import argon2 from "argon2";
+import crypto from "crypto";
+import type { CookieOptions, Request, Response } from "express";
+
 import { HASH_PROFILE } from "@/config/argon";
-import { CookieOptions, Request, Response } from "express";
 
 export class AuthUtils {
   static async hashPassword(plain: string) {

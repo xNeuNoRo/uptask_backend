@@ -1,5 +1,6 @@
+import type { Request, Response, NextFunction } from "express";
+
 import { AppError } from "@/utils";
-import { Request, Response, NextFunction } from "express";
 
 // Separate middleware to escalate to escalate the function if needed in the future
 export async function hasTeamAuthorization(

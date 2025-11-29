@@ -1,5 +1,6 @@
+import type { CorsOptions } from "cors";
+
 import { log, loggerFor, loggerForContext } from "@/lib/loggers";
-import { CorsOptions } from "cors";
 
 let logger = loggerForContext(loggerFor("infra"), {
   component: "api",
@@ -7,7 +8,7 @@ let logger = loggerForContext(loggerFor("infra"), {
 
 export const corsConfig: CorsOptions = {
   origin: function (origin, callback) {
-    const whitelist = [process.env.FRONTEND_URL];
+    const whitelist = [process.env.FRONTEND_URL, "http://localhost:5173"]; // Includes localhost for development purposes
 
     if (whitelist.includes(origin)) {
       callback(null, true);

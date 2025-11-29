@@ -1,5 +1,6 @@
-import { taskStatus } from "@/models/Task.model";
 import { body, param } from "express-validator";
+
+import { taskStatus } from "@/models/Task.model";
 
 export const projectValidator = [
   body("projectName")

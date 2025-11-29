@@ -1,7 +1,8 @@
-import { Request, Response } from "express";
-import User, { UserDTO } from "@/models/User.model";
-import { AppError } from "@/utils";
+import type { Request, Response } from "express";
+
 import { log, loggerFor, loggerForContext } from "@/lib/loggers";
+import User, { type UserDTO } from "@/models/User.model";
+import { AppError } from "@/utils";
 
 const logger = loggerForContext(loggerFor("team"), {
   component: "controller",
@@ -96,7 +97,7 @@ export class TeamMemberController {
       if (id === req.project.manager!.toString())
         throw new AppError("CANNOT_ADD_MANAGER_TO_TEAM");
 
-      if (req.project.team!.some((team) => team?.toString() === id))
+      if (req.project.team.some((team) => team?.toString() === id))
         throw new AppError("USER_ALREADY_IN_TEAM");
 
       const user = await User.findById(id).select("id");
@@ -144,7 +145,7 @@ export class TeamMemberController {
     const { userId } = req.params;
 
     try {
-      if (!req.project.team!.some((team) => team?.toString() === userId))
+      if (!req.project.team.some((team) => team?.toString() === userId))
         throw new AppError("USER_NOT_IN_TEAM");
 
       req.project.team = req.project.team.filter(

@@ -1,5 +1,6 @@
 onlyBuiltDependencies:
   - argon2
   - esbuild
+  - protobufjs
   - sharp
   - unrs-resolver

@@ -93,7 +93,7 @@ export class ProjectController {
       // or return 404 to avoid leaking project existence
       if (
         req.project.manager!.toString() !== req.user!.id.toString() &&
-        !req.project.team!.includes(req.user!.id)
+        !req.project.team.includes(req.user!.id)
       )
         throw new AppError("PROJECT_NOT_FOUND");
 

@@ -1,7 +1,8 @@
+import type { NextFunction, Request, Response } from "express";
+
 import { log, loggerFor, loggerForContext } from "@/lib/loggers";
-import User, { IUser } from "@/models/User.model";
+import User, { type IUser } from "@/models/User.model";
 import { AppError, JwtUtils } from "@/utils";
-import { NextFunction, Request, Response } from "express";
 
 declare global {
   namespace Express {

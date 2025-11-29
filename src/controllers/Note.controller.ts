@@ -1,7 +1,8 @@
-import { Request, Response } from "express";
-import Note, { NoteDTO } from "@/models/Note.model";
-import { AppError } from "@/utils";
+import type { Request, Response } from "express";
+
 import { log, loggerFor, loggerForContext } from "@/lib/loggers";
+import Note, { type NoteDTO } from "@/models/Note.model";
+import { AppError } from "@/utils";
 
 type NoteParams = {
   noteId: string;

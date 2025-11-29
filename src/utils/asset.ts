@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+
 import { ASSET_BASE_URL } from "@/emails/core/envconfig";
 
 const OUT = path.resolve("src/public/assets");

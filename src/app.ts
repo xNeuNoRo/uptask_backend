@@ -1,13 +1,14 @@
 import "@/config/tracing";
-import express, { type Express } from "express";
-import cors from "cors";
 import cookieParser from "cookie-parser";
+import cors from "cors";
+import express, { type Express } from "express";
+import path from "node:path";
 
 import { error, success, httpLogger } from "@/middlewares";
 import { registerRoutes } from "@/routes";
 import { AppError } from "@/utils";
+
 import { corsConfig } from "./config/cors";
-import path from "node:path";
 import { metrics } from "./middlewares/metrics.middleware";
 
 export function createApp(): Express {

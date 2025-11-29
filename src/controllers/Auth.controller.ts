@@ -1,11 +1,14 @@
-import { Request, Response } from "express";
-import { log, loggerFor, loggerForContext } from "@/lib/loggers";
-import { AppError, AuthUtils, JwtUtils } from "@/utils";
-import User, { UserDTO } from "@/models/User.model";
-import Token, { TokenDTO } from "@/models/Token.model";
-import { sendVerificationEmail } from "@/emails/builders/Verification.builder";
-import { sendChangePassEmail } from "@/emails/builders/ChangePass.builder";
+import type { Request, Response } from "express";
+
 import { sendChangeEmailCodeEmail } from "@/emails/builders/ChangeEmail.builder";
+import { sendChangePassEmail } from "@/emails/builders/ChangePass.builder";
+import { sendVerificationEmail } from "@/emails/builders/Verification.builder";
+import { log, loggerFor, loggerForContext } from "@/lib/loggers";
+import type { TokenDTO } from "@/models/Token.model";
+import Token from "@/models/Token.model";
+import type { UserDTO } from "@/models/User.model";
+import User from "@/models/User.model";
+import { AppError, AuthUtils, JwtUtils } from "@/utils";
 
 let logger = loggerForContext(loggerFor("auth"), {
   entityType: "user",

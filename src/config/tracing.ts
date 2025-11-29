@@ -1,8 +1,8 @@
-import { NodeSDK } from "@opentelemetry/sdk-node";
+import { credentials, Metadata } from "@grpc/grpc-js";
 import { getNodeAutoInstrumentations } from "@opentelemetry/auto-instrumentations-node";
 import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-grpc";
 import { resourceFromAttributes } from "@opentelemetry/resources";
-import { credentials, Metadata } from "@grpc/grpc-js";
+import { NodeSDK } from "@opentelemetry/sdk-node";
 
 const metadata = new Metadata();
 metadata.set(

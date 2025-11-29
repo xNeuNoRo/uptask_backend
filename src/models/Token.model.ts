@@ -1,6 +1,5 @@
 import {
   model,
-  PopulatedDoc,
   Schema,
   Types,
   type Document,
@@ -8,7 +7,6 @@ import {
 } from "mongoose";
 
 import type { CreateOf } from "@/types/mongoose-utils";
-import { IUser } from "./User.model";
 
 export const tokenType = {
   VERIFY_EMAIL: "verifyEmail",

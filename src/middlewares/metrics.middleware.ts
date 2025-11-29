@@ -1,5 +1,6 @@
-import { NextFunction, Request, Response } from "express";
-import { Registry, Counter } from "prom-client";
+import type { NextFunction, Request, Response } from "express";
+import { Counter, type Registry } from "prom-client";
+
 import prometheusRegistry from "@/config/metrics";
 
 declare global {

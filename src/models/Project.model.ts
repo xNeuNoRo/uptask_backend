@@ -7,11 +7,11 @@ import {
   type PopulatedDoc,
 } from "mongoose";
 
-import type { ITask } from "@/models/Task.model";
+import Task, { type ITask } from "@/models/Task.model";
 import type { CreateOf } from "@/types/mongoose-utils";
-import { IUser } from "./User.model";
-import Task from "@/models/Task.model";
+
 import Note from "./Note.model";
+import type { IUser } from "./User.model";
 
 export interface IProject extends Document {
   projectName: string;

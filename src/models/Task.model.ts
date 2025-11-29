@@ -7,6 +7,7 @@ import {
 } from "mongoose";
 
 import type { CreateOf } from "@/types/mongoose-utils";
+
 import Note from "./Note.model";
 
 export const taskStatus = {

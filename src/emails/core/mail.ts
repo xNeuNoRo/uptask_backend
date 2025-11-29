@@ -1,10 +1,11 @@
-import { mailConfig } from "@/config/mail";
-import nodemailer, { Transporter } from "nodemailer";
-import colors from "colors";
-import SMTPTransport from "nodemailer/lib/smtp-transport";
-import Mail, { Address } from "nodemailer/lib/mailer";
-import { log, loggerFor, loggerForContext } from "@/lib/loggers";
 import dns from "dns/promises";
+import nodemailer, { type Transporter } from "nodemailer";
+import type { Address } from "nodemailer/lib/mailer";
+import type Mail from "nodemailer/lib/mailer";
+import type SMTPTransport from "nodemailer/lib/smtp-transport";
+
+import { mailConfig } from "@/config/mail";
+import { log, loggerFor, loggerForContext } from "@/lib/loggers";
 import { AppError } from "@/utils";
 
 const logger = loggerForContext(loggerFor("infra"), {
@@ -55,6 +56,7 @@ export class MailUtils {
       try {
         await dns.resolveMx(emailDomain);
       } catch (err) {
+        void err;
         throw new AppError("EMAIL_NOT_VALID");
       }
     }
@@ -86,12 +88,6 @@ export class MailUtils {
           : accepted > 0
             ? "parcialmente"
             : "falló";
-      const color =
-        status === "exitosamente"
-          ? colors.green
-          : status === "parcialmente"
-            ? colors.yellow
-            : colors.red;
 
       const totalTime = Date.now() - start;
       log(

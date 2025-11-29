@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { Types } from "mongoose";
+import type { Types } from "mongoose";
 
 const expiresType = {
   access: parseInt(process.env.ACCESS_TTL!),

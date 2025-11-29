@@ -1,6 +1,6 @@
+import crypto from "crypto";
 import fs from "fs";
 import path from "path";
-import crypto from "crypto";
 
 // Pasar siempre el path del src de primero y el de out de segundo
 const [srcArg = "src/public/raw", outArg = "src/public/assets"] =

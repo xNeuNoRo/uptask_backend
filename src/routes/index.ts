@@ -1,9 +1,9 @@
 import { Router, type Express } from "express";
 
 // Import all routes
-import Project from "@/routes/project.routes";
-import Auth from "@/routes/auth.routes";
 import prometheusRegistry from "@/config/metrics";
+import Auth from "@/routes/auth.routes";
+import Project from "@/routes/project.routes";
 
 export function registerRoutes(app: Express) {
   // API v1 routes
